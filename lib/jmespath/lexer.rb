@@ -60,9 +60,9 @@ module JMESPath
         match_index = match.find_index { |token| !token.nil? }
         match_value = match[match_index]
         type = TOKEN_TYPES[match_index]
-        if type != :skip
-          token = { type:type, value:match_value, pos:offset }
-          case type
+        token = Token.new(type, match_value, offset)
+        if token.type != :skip
+          case token.type
           when :number then token_number(token, expression, offset)
           when :literal then token_literal(token, expression, offset)
           when :quoted_identifier
@@ -72,8 +72,10 @@ module JMESPath
         end
         offset += match_value.size
       end
-      tokens << { type:'eof', pos:offset, value:nil }
-      syntax_error('invalid expression' expression, offset)
+      tokens << Token.new(:eof, nil, offset)
+      unless expression.size == offset
+        syntax_error('invalid expression', expression, offset) 
+      end
       tokens
     end
 
