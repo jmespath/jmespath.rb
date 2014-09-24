@@ -70,7 +70,20 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def nud_lbrace(stream)
-      raise NotImplementedError
+      valid_keys = Set.new([:quoted_identifier, :identifier])
+      stream.next(match:valid_keys)
+      pairs = []
+      begin
+        pairs << parse_key_value_pair(stream)
+        if stream.token.type == :comma
+          stream.next(match:valid_keys)
+        end
+      end while stream.token.type != :rbrace
+      stream.next
+      {
+        type: :multi_select_hash,
+        children: pairs
+      }
     end
 
     def nud_lbracket(stream)
@@ -159,7 +172,11 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def led_or(stream, left)
-      raise NotImplementedError
+      stream.next
+      {
+        type: :or,
+        children: [left, expr(stream, Token::BINDING_POWER[:or])]
+      }
     end
 
     def led_pipe(stream, left)
@@ -195,7 +212,14 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def parse_key_value_pair(stream)
-      raise NotImplementedError
+      key = stream.token.value
+      stream.next(match:Set.new([:colon]))
+      stream.next
+      {
+        type: :key_value_pair,
+        key: key,
+        children: [expr(stream)]
+      }
     end
 
     def parse_multi_select_list(stream)

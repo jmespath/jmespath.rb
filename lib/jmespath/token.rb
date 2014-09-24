@@ -6,11 +6,7 @@ module JMESPath
 
     # binding power
     # @api private
-    BINDING_POWER = Hash.new do |h,k|
-      raise ArgumentError, "invalid type #{k.inspect}"
-    end
-
-    {
+    BINDING_POWER = {
       :eof               => 0,
       :quoted_identifier => 0,
       :identifier        => 0,
@@ -31,9 +27,7 @@ module JMESPath
       :filter            => 50,
       :lbracket          => 50,
       :lparen            => 60,
-    }.each do |k,v|
-      BINDING_POWER[k] = v
-    end
+    }
 
     # @param [Symbol] :type
     # @param [Mixed] :value

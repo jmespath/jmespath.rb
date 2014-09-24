@@ -11,12 +11,12 @@ describe 'Compliance' do
      'identifiers',
      'indices',
       #'literal',
-      #'multiselect',
+      'multiselect',
       #'ormatch',
       #'pipes',
       #'slice',
       #'syntax',
-     'unicode',
+      'unicode',
       'wildcard',
     ].any? { |type| path.match(type) }
 

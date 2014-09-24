@@ -57,7 +57,12 @@ module JMESPath
         value
 
       when :or
-        raise NotImplementedError
+        result = dispatch(node[:children][0], value)
+        if result.nil? or result.empty?
+          dispatch(node[:children][1], value)
+        else
+          result
+        end
 
       when :pipe
         raise NotImplementedError
@@ -72,7 +77,14 @@ module JMESPath
         end
 
       when :multi_select_hash
-        raise NotImplementedError
+        if value.nil?
+          nil
+        else
+          node[:children].each.with_object({}) do |child, hash|
+            hash[child[:key]] = dispatch(child[:children][0], value)
+          end
+        end
+
 
       when :comparator
         raise NotImplementedError
