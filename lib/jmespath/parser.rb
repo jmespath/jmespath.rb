@@ -90,7 +90,13 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def nud_quoted_identifier(stream)
-      raise NotImplementedError
+      token = stream.token
+      stream.next
+      if token.type == :lparen
+        raise 'quoted identifiers are not allowed for function names'
+      else
+        { type: :field, key: token[:value] }
+      end
     end
 
     def nud_star(stream)
