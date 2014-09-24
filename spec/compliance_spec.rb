@@ -8,7 +8,7 @@ describe 'Compliance' do
       'escape',
       #'filters',
       #'functions',
-      #'identifiers',
+      'identifiers',
       'indices',
       #'literal',
       #'multiselect',
