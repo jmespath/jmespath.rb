@@ -99,7 +99,12 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def nud_literal(stream)
-      raise NotImplementedError
+      value = stream.token.value
+      stream.next
+      {
+        type: :literal,
+        value: value
+      }
     end
 
     def nud_quoted_identifier(stream)

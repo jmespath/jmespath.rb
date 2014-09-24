@@ -51,7 +51,7 @@ module JMESPath
         end
 
       when :literal
-        raise NotImplementedError
+        node[:value]
 
       when :current
         value

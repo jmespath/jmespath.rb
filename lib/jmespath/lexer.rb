@@ -86,6 +86,7 @@ module JMESPath
     end
 
     def token_literal(token, expression, offset)
+      token[:value] = token[:value][1..-2].lstrip.gsub('\`', '`')
       token[:value] =
         case token[:value]
         when 'true', 'false' then token[:value] == 'true'

@@ -10,7 +10,7 @@ describe 'Compliance' do
       #'functions',
      'identifiers',
      'indices',
-      #'literal',
+      'literal',
       'multiselect',
       'ormatch',
       'pipes',
