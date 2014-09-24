@@ -4,20 +4,20 @@ describe 'Compliance' do
   Dir.glob('spec/compliance/*.json').each do |path|
 
     next unless [
-      'basic',
-      'escape',
+     'basic',
+     'escape',
       #'filters',
       #'functions',
-      'identifiers',
-      'indices',
+     'identifiers',
+     'indices',
       #'literal',
       #'multiselect',
       #'ormatch',
       #'pipes',
       #'slice',
       #'syntax',
-      'unicode',
-      #'wildcard',
+     'unicode',
+      'wildcard',
     ].any? { |type| path.match(type) }
 
     describe(File.basename(path).split('.').first) do

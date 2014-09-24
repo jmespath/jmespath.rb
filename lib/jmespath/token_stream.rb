@@ -27,7 +27,7 @@ module JMESPath
     end
 
     def lookahead(count)
-      raise NotImplementedError
+      @tokens[@position + count] || Token::NULL_TOKEN
     end
 
     # @api private

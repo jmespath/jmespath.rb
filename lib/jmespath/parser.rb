@@ -100,7 +100,7 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def nud_star(stream)
-      raise NotImplementedError
+      parse_wildcard_object(stream, CURRENT_NODE)
     end
 
     def led_comparator(stream, left)
@@ -150,7 +150,7 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
           ]
         }
       else
-        parse_wildcard_array(left)
+        parse_wildcard_array(stream, left)
       end
     end
 
@@ -230,12 +230,29 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
       end
     end
 
-    def parse_wildcard_array(stream)
-      raise NotImplementedError
+    def parse_wildcard_array(stream, left = nil)
+      stream.next(match:Set.new([:rbracket]))
+      stream.next
+      {
+        type: :projection,
+        from: :array,
+        children: [
+          left ? left : CURRENT_NODE,
+          parse_projection(stream, Token::BINDING_POWER[:star])
+        ]
+      }
     end
 
-    def parse_wildcard_object(stream)
-      raise NotImplementedError
+    def parse_wildcard_object(stream, left = nil)
+      stream.next
+      {
+        type: :projection,
+        from: :object,
+        children: [
+          left ? left : CURRENT_NODE,
+          parse_projection(stream, Token::BINDING_POWER[:star])
+        ]
+      }
     end
 
   end

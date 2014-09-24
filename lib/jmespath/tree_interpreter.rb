@@ -32,18 +32,13 @@ module JMESPath
         # child through the values of the right child and aggregating
         # the non-null results into the return value.
         left = dispatch(node[:children][0], value)
-
-        if hash_like?(left)
-          values = left.values
-        elsif array_like?(left)
-          values = left
+        if node[:from] == :object && hash_like?(left)
+          projection(left.values, node)
+        elsif node[:from] == :array && array_like?(left)
+          projection(left, node)
         else
-          return nil
+          nil
         end
-
-        values.inject([]) do |list, v|
-          list << dispatch(node[:children][1], v)
-        end.compact
 
       when :flatten
         value = dispatch(node[:children][0], value)
@@ -105,6 +100,12 @@ module JMESPath
 
     def array_like?(value)
       Array === value
+    end
+
+    def projection(values, node)
+      values.inject([]) do |list, v|
+        list << dispatch(node[:children][1], v)
+      end.compact
     end
 
   end
