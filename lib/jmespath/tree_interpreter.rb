@@ -65,7 +65,7 @@ module JMESPath
         end
 
       when :pipe
-        raise NotImplementedError
+        dispatch(node[:children][1], dispatch(node[:children][0], value))
 
       when :multi_select_list
         if value.nil?
@@ -93,7 +93,8 @@ module JMESPath
         raise NotImplementedError
 
       when :function
-        raise NotImplementedError
+        args = node[:children].map { |child| dispatch(child, value) }
+        send("function_#{node[:fn]}", *args)
 
       when :slice
         raise NotImplementedError
@@ -118,6 +119,10 @@ module JMESPath
       values.inject([]) do |list, v|
         list << dispatch(node[:children][1], v)
       end.compact
+    end
+
+    def function_sort(values)
+      values.sort
     end
 
   end

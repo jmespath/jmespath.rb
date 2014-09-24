@@ -13,7 +13,7 @@ describe 'Compliance' do
       #'literal',
       'multiselect',
       'ormatch',
-      #'pipes',
+      'pipes',
       #'slice',
       #'syntax',
       'unicode',

@@ -168,7 +168,21 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def led_lparen(stream, left)
-      raise NotImplementedError
+      args = []
+      name = left[:key]
+      stream.next
+      while stream.token.type != :rparen
+        args << expr(stream, 0)
+        if stream.token.type == :comma
+          stream.next
+        end
+      end
+      stream.next
+      {
+        type: :function,
+        fn: name,
+        children: args,
+      }
     end
 
     def led_or(stream, left)
@@ -180,7 +194,11 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def led_pipe(stream, left)
-      raise NotImplementedError
+      stream.next
+      {
+        type: :pipe,
+        children: [left, expr(stream, Token::BINDING_POWER[:pipe])],
+      }
     end
 
     def parse_array_index_expression(stream)
