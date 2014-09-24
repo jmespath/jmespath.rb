@@ -12,7 +12,7 @@ describe 'Compliance' do
      'indices',
       #'literal',
       'multiselect',
-      #'ormatch',
+      'ormatch',
       #'pipes',
       #'slice',
       #'syntax',
