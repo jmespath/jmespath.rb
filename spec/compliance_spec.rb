@@ -3,7 +3,22 @@ require 'spec_helper'
 describe 'Compliance' do
   Dir.glob('spec/compliance/*.json').each do |path|
 
-    next unless path.match(/basic/)
+    next unless [
+      'basic',
+      'escape',
+      #'filters',
+      #'functions',
+      #'identifiers',
+      'indices',
+      #'literal',
+      #'multiselect',
+      #'ormatch',
+      #'pipes',
+      #'slice',
+      #'syntax',
+      'unicode',
+      #'wildcard',
+    ].any? { |type| path.match(type) }
 
     describe(File.basename(path).split('.').first) do
       load_json(path).each do |scenario|

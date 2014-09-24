@@ -59,7 +59,7 @@ module JMESPath
         raise NotImplementedError
 
       when :current
-        raise NotImplementedError
+        value
 
       when :or
         raise NotImplementedError
