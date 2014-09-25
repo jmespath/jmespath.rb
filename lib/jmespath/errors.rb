@@ -7,11 +7,11 @@ module JMESPath
 
     class SyntaxError < Error; end
 
-    class InvalidType < Error; end
+    class InvalidTypeError < Error; end
 
-    class InvalidArity < Error; end
+    class InvalidArityError < Error; end
 
-    class UnknownFunction < Error; end
+    class UnknownFunctionError < Error; end
 
   end
 end

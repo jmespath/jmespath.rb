@@ -1,4 +1,4 @@
-# echo '{"foo":[{"bar":1}]}' | php bin/jp.php [Versions,DeleteMarkers][].Id
+require 'set'
 
 module JMESPath
   class Parser
@@ -27,9 +27,18 @@ module JMESPath
 puts "\n" + stream.inspect + "\n\n"
       result = expr(stream)
       if stream.token.type != :eof
-        raise "expected :eof got #{stream.token.type}"
+        raise Errors::SyntaxError, "expected :eof got #{stream.token.type}"
       else
         result
+      end
+    end
+
+    # @api private
+    def method_missing(method_name, *args)
+      if matches = method_name.match(/^(nud_|led_)(.*)/)
+        raise Errors::SyntaxError, "unexpected token #{matches[2]}"
+      else
+        super
       end
     end
 
@@ -56,11 +65,11 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def nud_filter(stream)
-      raise NotImplementedError
+      led_filter(stream, CURRENT_NODE)
     end
 
     def nud_flatten(stream)
-      raise NotImplementedError
+      led_flatten(stream, CURRENT_NODE)
     end
 
     def nud_identifier(stream)
@@ -122,7 +131,16 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def led_comparator(stream, left)
-      raise NotImplementedError
+      token = stream.token
+      stream.next
+      {
+        type: :comparator,
+        relation: token.value,
+        children: [
+          left,
+          expr(stream),
+        ]
+      }
     end
 
     def led_dot(stream, left)
@@ -141,7 +159,24 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def led_filter(stream, left)
-      raise NotImplementedError
+      stream.next
+      expression = expr(stream)
+      if stream.token.type != :rbracket
+        raise Errors::SyntaxError, 'expected a closing rbracket for the filter'
+      end
+      stream.next
+      rhs = parse_projection(stream, Token::BINDING_POWER[:filter])
+      {
+        type: :projection,
+        from: :array,
+        children: [
+          left ? left : CURRENT_NODE,
+          {
+            type: :condition,
+            children: [expression, rhs],
+          }
+        ]
+      }
     end
 
     def led_flatten(stream, left)
@@ -248,20 +283,20 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def parse_multi_select_list(stream)
-      children = []
+      nodes = []
       begin
-        children << expr(stream)
+        nodes << expr(stream)
         if stream.token.type == :comma
           stream.next
           if stream.token.type == :rbracket
-            raise 'expression epxected, found rbracket'
+            raise Errors::SyntaxError, 'expression epxected, found rbracket'
           end
         end
       end while stream.token.type != :rbracket
       stream.next
       {
         type: :multi_select_list,
-        children: children
+        children: nodes
       }
     end
 
@@ -275,7 +310,7 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
       elsif type == :lbracket || type == :filter
         expr(stream, binding_power)
       else
-        raise 'syntax error after projection'
+        raise Errors::SyntaxError, 'syntax error after projection'
       end
     end
 

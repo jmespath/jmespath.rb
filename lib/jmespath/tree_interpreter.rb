@@ -34,6 +34,8 @@ module JMESPath
         left = dispatch(node[:children][0], value)
         if node[:from] == :object && hash_like?(left)
           projection(left.values, node)
+        elsif node[:from] == :object && left == []
+          projection(left, node)
         elsif node[:from] == :array && array_like?(left)
           projection(left, node)
         else
@@ -71,9 +73,7 @@ module JMESPath
         if value.nil?
           value
         else
-          node[:children].inject([]) do |collected, child_node|
-            collected << dispatch(child_node, value)
-          end
+          node[:children].map { |n| dispatch(n, value) }
         end
 
       when :multi_select_hash
@@ -87,7 +87,16 @@ module JMESPath
 
 
       when :comparator
-        raise NotImplementedError
+        left = dispatch(node[:children][0], value)
+        right = dispatch(node[:children][1], value)
+        case node[:relation]
+        when '==' then compare_values(left, right)
+        when '!=' then !compare_values(left, right)
+        when '>' then is_int(left) && is_int(right) && left > right
+        when '>=' then is_int(left) && is_int(right) && left >= right
+        when '<' then is_int(left) && is_int(right) && left < right
+        when '<=' then is_int(left) && is_int(right) && left <= right
+        end
 
       when :condition
         raise NotImplementedError
@@ -188,5 +197,18 @@ puts [values, start, stop, step].inspect
         endpoint
       end
     end
+
+    def compare_values(a, b)
+      if a == b
+        true
+      else
+        false
+      end
+    end
+
+    def is_int(value)
+      Integer === value
+    end
+
   end
 end

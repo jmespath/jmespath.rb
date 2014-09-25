@@ -49,7 +49,7 @@ module JMESPath
 
     def validate_match(token, match)
       if match && !match.include?(token.type)
-        raise "type missmatch"
+        raise Errors::SyntaxError, "type missmatch"
       else
         token
       end

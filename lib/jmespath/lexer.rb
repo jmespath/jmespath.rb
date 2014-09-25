@@ -92,23 +92,25 @@ module JMESPath
         when 'true', 'false' then token[:value] == 'true'
         when 'null' then nil
         when '' then syntax_error("empty json literal", expression, offset)
-        when JSON_VALUE then decode_json(token[:value])
-        when JSON_NUMBER then decode_json(token[:value])
-        else decode_json('"' + token[:value] + '"')
+        when JSON_VALUE then decode_json(token[:value], expression, offset)
+        when JSON_NUMBER then decode_json(token[:value], expression, offset)
+        else decode_json('"' + token[:value] + '"', expression, offset)
         end
     end
 
     def token_quoted_identifier(token, expression, offset)
-      token[:value] = decode_json(token[:value])
+      token[:value] = decode_json(token[:value], expression, offset)
     end
 
-    def decode_json(json)
-      # TODO : handle JSON parsing errors for invalid quoted identifiers
+    def decode_json(json, expression, offset)
       MultiJson.load(json)
+    rescue MultiJson::ParseError => e
+      syntax_error(e.message, expression, offset)
     end
 
     def syntax_error(message, expression, offset)
-      raise Errors::SyntaxError.new(message, expression, offset)
+      msg = message + "in #{expression.inspect} at #{offset}"
+      raise Errors::SyntaxError.new(msg)
     end
 
   end

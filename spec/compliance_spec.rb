@@ -15,7 +15,7 @@ describe 'Compliance' do
       'ormatch',
       'pipes',
       'slice',
-      #'syntax',
+      'syntax',
       'unicode',
       'wildcard',
     ].any? { |type| path.match(type) }
@@ -25,24 +25,37 @@ describe 'Compliance' do
         describe("Given #{scenario['given'].inspect}") do
           scenario['cases'].each do |test_case|
 
-            it "searching #{test_case['expression'].inspect} returns #{test_case['result'].inspect} #{test_case['error']}" do
+            if test_case['error']
 
-              begin
+              it "the expression #{test_case['expression'].inspect} raises a #{test_case['error']} error" do
+
+                error_class = case test_case['error']
+                  when 'runtime' then JMESPath::Errors::RuntimeError
+                  when 'syntax' then JMESPath::Errors::SyntaxError
+                  when 'invalid-type' then JMESPath::Errors::InvalidTypeError
+                  when 'invalid-arity' then JMESPath::Errors::InvalidArityError
+                  when 'unknown-function' then JMESPath::Errors::UnknownFunctionError
+                  else raise "unhandled error type #{test_case['error']}"
+                end
+
+                raised = nil
+                begin
+                  JMESPath.search(test_case['expression'], scenario['given'])
+                rescue JMESPath::Errors::Error => error
+                  raised = error
+                end
+
+                expect(raised).to be_kind_of(error_class)
+              end
+
+            else
+
+              it "searching #{test_case['expression'].inspect} returns #{test_case['result'].inspect}" do
                 result = JMESPath.search(test_case['expression'], scenario['given'])
                 expect(result).to eq(test_case['result'])
-              rescue JMESPath::Errors::RuntimeError
-                expect(test_case['error']).to eq('runtime')
-              rescue JMESPath::Errors::SyntaxError
-                expect(test_case['error']).to eq('syntax')
-              rescue JMESPath::Errors::InvalidType
-                expect(test_case['error']).to eq('invalid-type')
-              rescue JMESPath::Errors::InvalidArity
-                expect(test_case['error']).to eq('invalid-arity')
-              rescue JMESPath::Errors::UnknownFunction
-                expect(test_case['error']).to eq('unknown-function')
               end
-            end
 
+            end
           end
         end
       end
