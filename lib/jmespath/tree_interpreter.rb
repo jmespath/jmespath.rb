@@ -99,7 +99,9 @@ module JMESPath
         end
 
       when :condition
-        raise NotImplementedError
+        true == dispatch(node[:children][0], value) ?
+          dispatch(node[:children][1], value) :
+          nil
 
       when :function
         args = node[:children].map { |child| dispatch(child, value) }

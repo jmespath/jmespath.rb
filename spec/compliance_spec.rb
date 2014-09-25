@@ -4,12 +4,12 @@ describe 'Compliance' do
   Dir.glob('spec/compliance/*.json').each do |path|
 
     next unless [
-     'basic',
-     'escape',
-      #'filters',
+      'basic',
+      'escape',
+      'filters',
       #'functions',
-     'identifiers',
-     'indices',
+      'identifiers',
+      'indices',
       'literal',
       'multiselect',
       'ormatch',
