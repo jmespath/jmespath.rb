@@ -57,11 +57,16 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
     end
 
     def nud_current(stream)
-      raise NotImplementedError
+      stream.next
+      CURRENT_NODE
     end
 
     def nud_expref(stream)
-      raise NotImplementedError
+      stream.next
+      {
+        type: :expression,
+        children: [expr(stream, 2)]
+      }
     end
 
     def nud_filter(stream)

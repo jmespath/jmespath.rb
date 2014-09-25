@@ -5,6 +5,15 @@ module JMESPath
       dispatch(node, data)
     end
 
+    # @api private
+    def method_missing(method_name, *args)
+      if matches = method_name.match(/^function_(.*)/)
+        raise Errors::UnknownFunctionError, "unknown function #{matches[1]}()"
+      else
+        super
+      end
+    end
+
     private
 
     def dispatch(node, value)
@@ -111,7 +120,7 @@ module JMESPath
         function_slice(value, *node[:args])
 
       when :expression
-        raise NotImplementedError
+        ExprNode.new(self, node[:children][0])
 
       else
         raise NotImplementedError
@@ -132,12 +141,152 @@ module JMESPath
       end.compact
     end
 
+    def function_abs(*args)
+      if args.count == 1
+        value = args.first
+      else
+        raise Errors::InvalidArityError, "function abs() expects one argument"
+      end
+      if Numeric === value
+        value.abs
+      else
+        raise Errors::InvalidTypeError, "function abs() expects a number"
+      end
+    end
+
+    def function_avg(*args)
+      if args.count == 1
+        values = args.first
+      else
+        raise Errors::InvalidArityError, "function avg() expects one argument"
+      end
+      if Array === values
+        values.inject(0) do |total,n|
+          if Numeric === n
+            total + n
+          else
+            raise Errors::InvalidTypeError, "function avg() expects numeric values"
+          end
+        end / values.size.to_f
+      else
+        raise Errors::InvalidTypeError, "function avg() expects a number"
+      end
+    end
+
+    def function_ceil(*args)
+      if args.count == 1
+        value = args.first
+      else
+        raise Errors::InvalidArityError, "function ceil() expects one argument"
+      end
+      if Numeric === value
+        value.ceil
+      else
+        raise Errors::InvalidTypeError, "function ceil() expects a numeric value"
+      end
+    end
+
+    def function_contains(*args)
+      if args.count == 2
+        if String === args[0] || Array === args[0]
+          args[0].include?(args[1])
+        else
+          raise Errors::InvalidTypeError, "contains expects 2nd arg to be a list"
+        end
+      else
+        raise Errors::InvalidArityError, "function contains() expects 2 arguments"
+      end
+    end
+
+    def function_floor(*args)
+      if args.count == 1
+        value = args.first
+      else
+        raise Errors::InvalidArityError, "function floor() expects one argument"
+      end
+      if Numeric === value
+        value.floor
+      else
+        raise Errors::InvalidTypeError, "function floor() expects a numeric value"
+      end
+    end
+
+    def function_length(*args)
+      if args.count == 1
+        value = args.first
+      else
+        raise Errors::InvalidArityError, "function length() expects one argument"
+      end
+      case value
+      when Hash, Array, String then value.size
+      else raise Errors::InvalidTypeError, "function length() expects string, array or object"
+      end
+    end
+
+    def function_max(*args)
+      if args.count == 1
+        values = args.first
+      else
+        raise Errors::InvalidArityError, "function max() expects one argument"
+      end
+      if Array === values
+        values.inject(values.first) do |max, v|
+          if Numeric === v
+            v > max ? v : max
+          else
+            raise Errors::InvalidTypeError, "function max() expects numeric values"
+          end
+        end
+      else
+        raise Errors::InvalidTypeError, "function max() expects an array"
+      end
+    end
+
+    def function_min(*args)
+      if args.count == 1
+        values = args.first
+      else
+        raise Errors::InvalidArityError, "function min() expects one argument"
+      end
+      if Array === values
+        values.inject(values.first) do |min, v|
+          if Numeric === v
+            v < min ? v : min
+          else
+            raise Errors::InvalidTypeError, "function min() expects numeric values"
+          end
+        end
+      else
+        raise Errors::InvalidTypeError, "function min() expects an array"
+      end
+    end
+
+    def function_type(*args)
+      if args.count == 1
+        value = args.first
+      else
+        raise Errors::InvalidArityError, "function type() expects one argument"
+      end
+      case
+      when ExpressionNode === value then 'expression'
+      when String === value then 'string'
+      when hash_like?(value) then 'object'
+      when array_like?(value) then 'array'
+      when [true, false].include?(value) then 'boolean'
+      when value.nil? then 'null'
+      when Numeric === value then 'number'
+      end
+    end
+
+    def fucntion_keys(*args)
+      raise NotImplementedError
+    end
+
     def function_sort(values)
       values.sort
     end
 
     def function_slice(values, *args)
-puts "VALUES: #{values.inspect}"
       if String === values || array_like?(values)
         _slice(values, *args)
       else

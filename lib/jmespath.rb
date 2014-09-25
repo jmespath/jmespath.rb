@@ -1,6 +1,7 @@
 module JMESPath
 
   autoload :Errors, 'jmespath/errors'
+  autoload :ExprNode, 'jmespath/expr_node'
   autoload :Lexer, 'jmespath/lexer'
   autoload :Parser, 'jmespath/parser'
   autoload :Runtime, 'jmespath/runtime'
