@@ -1,24 +1,17 @@
 module JMESPath
   module Errors
 
-    class SyntaxError < ::SyntaxError
+    class Error < StandardError; end
 
-      # @param [String] message
-      # @param [String<JMESPath>] expression
-      # @param [Integer] offset
-      def initialize(message, expression, offset)
-        @expression = expression
-        @offset = offset
-        super(message)
-      end
+    class RuntimeError < Error; end
 
-      # @return [String<JMESPath>]
-      attr_reader :expression
+    class SyntaxError < Error; end
 
-      # @return [Integer]
-      attr_reader :expression
+    class InvalidType < Error; end
 
-    end
+    class InvalidArity < Error; end
+
+    class UnknownFunction < Error; end
+
   end
-
 end

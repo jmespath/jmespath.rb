@@ -14,7 +14,7 @@ describe 'Compliance' do
       'multiselect',
       'ormatch',
       'pipes',
-      #'slice',
+      'slice',
       #'syntax',
       'unicode',
       'wildcard',
@@ -25,10 +25,22 @@ describe 'Compliance' do
         describe("Given #{scenario['given'].inspect}") do
           scenario['cases'].each do |test_case|
 
-            it "searching #{test_case['expression'].inspect} returns #{test_case['result'].inspect}" do
+            it "searching #{test_case['expression'].inspect} returns #{test_case['result'].inspect} #{test_case['error']}" do
 
-              result = JMESPath.search(test_case['expression'], scenario['given'])
-              expect(result).to eq(test_case['result'])
+              begin
+                result = JMESPath.search(test_case['expression'], scenario['given'])
+                expect(result).to eq(test_case['result'])
+              rescue JMESPath::Errors::RuntimeError
+                expect(test_case['error']).to eq('runtime')
+              rescue JMESPath::Errors::SyntaxError
+                expect(test_case['error']).to eq('syntax')
+              rescue JMESPath::Errors::InvalidType
+                expect(test_case['error']).to eq('invalid-type')
+              rescue JMESPath::Errors::InvalidArity
+                expect(test_case['error']).to eq('invalid-arity')
+              rescue JMESPath::Errors::UnknownFunction
+                expect(test_case['error']).to eq('unknown-function')
+              end
             end
 
           end

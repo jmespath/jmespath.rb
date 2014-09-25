@@ -221,7 +221,9 @@ puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
       if pos == 0
         { type: :index, index: parts[0] }
       elsif pos > 2
-        raise NotImplementedError, "slice not supported"
+        raise Errors::SyntaxError, 'invalid array slice syntax: too many colons'
+      else
+        { type: :slice, args: parts }
       end
     end
 
