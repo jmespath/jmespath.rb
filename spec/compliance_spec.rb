@@ -2,6 +2,9 @@ require 'spec_helper'
 
 describe 'Compliance' do
   Dir.glob('spec/compliance/*.json').each do |path|
+
+    next unless path.match('functions')
+
     describe(File.basename(path).split('.').first) do
       load_json(path).each do |scenario|
         describe("Given #{scenario['given'].inspect}") do

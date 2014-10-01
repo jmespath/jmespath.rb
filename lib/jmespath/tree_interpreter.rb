@@ -297,8 +297,6 @@ module JMESPath
     def _slice(values, start, stop, step)
       start, stop, step = _adjust_slice(values.size, start, stop, step)
       result = []
-puts ''
-puts [values, start, stop, step].inspect
       if step > 0
         i = start
         while i < stop
