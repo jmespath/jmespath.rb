@@ -4,5 +4,5 @@ task 'gem:build' do
 end
 
 task 'gem:push' do
-  puts("gem push jmespath-#{$VERSION}.gem")
+  sh("gem push jmespath-#{$VERSION}.gem")
 end
