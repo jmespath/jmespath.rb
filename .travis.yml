@@ -1,5 +1,7 @@
 script: bundle exec rake
 
+bundler_args: --without docs
+
 branches:
   only:
   - master
