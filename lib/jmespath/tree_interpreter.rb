@@ -7,7 +7,7 @@ module JMESPath
 
     # @api private
     def method_missing(method_name, *args)
-      if matches = method_name.match(/^function_(.*)/)
+      if matches = method_name.to_s.match(/^function_(.*)/)
         raise Errors::UnknownFunctionError, "unknown function #{matches[1]}()"
       else
         super
@@ -263,27 +263,176 @@ module JMESPath
 
     def function_type(*args)
       if args.count == 1
-        value = args.first
+        get_type(args.first)
       else
         raise Errors::InvalidArityError, "function type() expects one argument"
       end
-      case
-      when ExpressionNode === value then 'expression'
-      when String === value then 'string'
-      when hash_like?(value) then 'object'
-      when array_like?(value) then 'array'
-      when [true, false].include?(value) then 'boolean'
-      when value.nil? then 'null'
-      when Numeric === value then 'number'
+    end
+
+    def function_keys(*args)
+      if args.count == 1
+        value = args.first
+        if hash_like?(value)
+          case value
+          when Hash then value.keys.map(&:to_s)
+          when Struct then value.members.map(&:to_s)
+          else raise NotImplementedError
+          end
+        else
+          raise Errors::InvalidTypeError, "function keys() expects a hash"
+        end
+      else
+        raise Errors::InvalidArityError, "function keys() expects one argument"
       end
     end
 
-    def fucntion_keys(*args)
-      raise NotImplementedError
+    def function_values(*args)
+      if args.count == 1
+        value = args.first
+        if hash_like?(value)
+          value.values
+        elsif array_like?(value)
+          value
+        else
+          raise Errors::InvalidTypeError, "function values() expects an array or a hash"
+        end
+      else
+        raise Errors::InvalidArityError, "function values() expects one argument"
+      end
     end
 
-    def function_sort(values)
-      values.sort
+    def function_join(*args)
+      if args.count == 2
+        glue = args[0]
+        values = args[1]
+        if !(String === glue)
+          raise Errors::InvalidTypeError, "function join() expects the first argument to be a string"
+        elsif array_like?(values) && values.all? { |v| String === v }
+          values.join(glue)
+        else
+          raise Errors::InvalidTypeError, "function join() expects values to be an array of strings"
+        end
+      else
+        raise Errors::InvalidArityError, "function join() expects an array of strings"
+      end
+    end
+
+    def function_to_string(*args)
+      if args.count == 1
+        value = args.first
+        String === value ? value : MultiJson.dump(value)
+      else
+        raise Errors::InvalidArityError, "function to_string() expects one argument"
+      end
+    end
+
+    def function_to_number(*args)
+      if args.count == 1
+        begin
+          value = Float(args.first)
+          Integer(value) === value ? value.to_i : value
+        rescue
+          nil
+        end
+      else
+        raise Errors::InvalidArityError, "function to_number() expects one argument"
+      end
+    end
+
+    def function_sum(*args)
+      if args.count == 1 && array_like?(args.first)
+        args.first.inject(0) do |sum,n|
+          if Numeric === n
+            sum + n
+          else
+            raise Errors::InvalidTypeError, "function sum() expects values to be numeric"
+          end
+        end
+      else
+        raise Errors::InvalidArityError, "function sum() expects one argument"
+      end
+    end
+
+    def function_not_null(*args)
+      if args.count > 0
+        args.find { |value| !value.nil? }
+      else
+        raise Errors::InvalidArityError, "function not_null() expects one or more arguments"
+      end
+    end
+
+    def function_sort(*args)
+      if args.count == 1
+        value = args.first
+        if array_like?(value)
+          value.sort do |a, b|
+            a_type = get_type(a)
+            b_type = get_type(b)
+            if ['string', 'number'].include?(a_type) && a_type == b_type
+              a <=> b
+            else
+              raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+            end
+          end
+        else
+          raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+        end
+      else
+        raise Errors::InvalidArityError, "function sort() expects one argument"
+      end
+    end
+
+    def function_sort_by(*args)
+      if args.count == 2
+        if get_type(args[0]) == 'array' && get_type(args[1]) == 'expression'
+          values = args[0]
+          expression = args[1]
+          values.sort do |a,b|
+            a_value = expression.interpreter.visit(expression.node, a)
+            b_value = expression.interpreter.visit(expression.node, b)
+            a_type = get_type(a_value)
+            b_type = get_type(b_value)
+            if ['string', 'number'].include?(a_type) && a_type == b_type
+              a_value <=> b_value
+            else
+              raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+            end
+          end
+        else
+          raise Errors::InvalidTypeError, "function sort_by() expects an array and an expression"
+        end
+      else
+        raise Errors::InvalidArityError, "function sort_by() expects two arguments"
+      end
+    end
+
+    def function_max_by(*args)
+      number_compare(:max, *args)
+    end
+
+    def function_min_by(*args)
+      number_compare(:min, *args)
+    end
+
+    def number_compare(mode, *args)
+      if args.count == 2
+        if get_type(args[0]) == 'array' && get_type(args[1]) == 'expression'
+          values = args[0]
+          expression = args[1]
+          args[0].send("#{mode}_by") do |entry|
+            value = expression.interpreter.visit(expression.node, entry)
+            if get_type(value) == 'number'
+              value
+            else
+              raise Errors::InvalidTypeError, "function #{mode}_by() expects values to be an numbers"
+            end
+          end
+        else
+          raise Errors::InvalidTypeError, "function #{mode}_by() expects an array and an expression"
+        end
+      else
+        raise Errors::InvalidArityError, "function #{mode}_by() expects two arguments"
+      end
     end
 
     def function_slice(values, *args)
@@ -357,6 +506,18 @@ module JMESPath
 
     def is_int(value)
       Integer === value
+    end
+
+    def get_type(value)
+      case
+      when ExprNode === value then 'expression'
+      when String === value then 'string'
+      when hash_like?(value) then 'object'
+      when array_like?(value) then 'array'
+      when [true, false].include?(value) then 'boolean'
+      when value.nil? then 'null'
+      when Numeric === value then 'number'
+      end
     end
 
   end

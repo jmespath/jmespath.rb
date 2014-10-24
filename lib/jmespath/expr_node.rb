@@ -2,7 +2,7 @@ module JMESPath
   class ExprNode
 
     def initialize(interpreter, node)
-      @intepreter = interpreter
+      @interpreter = interpreter
       @node = node
     end
 
