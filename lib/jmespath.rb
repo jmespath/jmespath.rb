@@ -8,6 +8,7 @@ module JMESPath
   autoload :Token, 'jmespath/token'
   autoload :TokenStream, 'jmespath/token_stream'
   autoload :TreeInterpreter, 'jmespath/tree_interpreter'
+  autoload :VERSION, 'jmespath/version'
 
   class << self
 
