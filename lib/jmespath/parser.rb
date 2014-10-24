@@ -24,7 +24,7 @@ module JMESPath
     # @param [String<JMESPath>] expression
     def parse(expression)
       stream = TokenStream.new(expression, @lexer.tokenize(expression))
-#puts "\n" + stream.inspect + "\n\n"
+      #puts "\n" + stream.inspect + "\n\n"
       result = expr(stream)
       if stream.token.type != :eof
         raise Errors::SyntaxError, "expected :eof got #{stream.token.type}"
@@ -47,10 +47,10 @@ module JMESPath
     # @param [TokenStream] stream
     # @param [Integer] rbp Right binding power
     def expr(stream, rbp = 0)
-#puts "nud_#{stream.token.type}"
+      #puts "nud_#{stream.token.type}"
       left = send("nud_#{stream.token.type}", stream)
       while rbp < stream.token.binding_power
-#puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
+      #puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
         left = send("led_#{stream.token.type}", stream, left)
       end
       left
@@ -123,9 +123,10 @@ module JMESPath
 
     def nud_quoted_identifier(stream)
       token = stream.token
-      stream.next
-      if token.type == :lparen
-        raise 'quoted identifiers are not allowed for function names'
+      next_token = stream.next
+      if next_token.type == :lparen
+        msg = 'quoted identifiers are not allowed for function names'
+        raise Errors::SyntaxError, msg
       else
         { type: :field, key: token[:value] }
       end
