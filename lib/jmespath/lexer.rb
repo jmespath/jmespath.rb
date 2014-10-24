@@ -1,6 +1,7 @@
 require 'multi_json'
 
 module JMESPath
+  # @api private
   class Lexer
 
     # @api private

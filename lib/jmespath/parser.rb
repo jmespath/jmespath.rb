@@ -1,6 +1,7 @@
 require 'set'
 
 module JMESPath
+  # @api private
   class Parser
 
     # @api private

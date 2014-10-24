@@ -1,4 +1,5 @@
 module JMESPath
+  # @api private
   class ExprNode
 
     def initialize(interpreter, node)

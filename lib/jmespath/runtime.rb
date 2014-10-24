@@ -1,4 +1,5 @@
 module JMESPath
+  # @api private
   class Runtime
 
     # @option options [Parser] :parser

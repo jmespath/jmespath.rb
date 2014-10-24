@@ -1,4 +1,5 @@
 module JMESPath
+  # @api private
   class Token < Struct.new(:type, :value, :position, :binding_power)
 
     # @api private
