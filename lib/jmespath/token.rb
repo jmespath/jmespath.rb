@@ -29,9 +29,9 @@ module JMESPath
       :lparen            => 60,
     }
 
-    # @param [Symbol] :type
-    # @param [Mixed] :value
-    # @param [Integer] :position
+    # @param [Symbol] type
+    # @param [Mixed] value
+    # @param [Integer] position
     def initialize(type, value, position)
       super(type, value, position, BINDING_POWER[type])
     end
