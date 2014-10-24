@@ -29,7 +29,7 @@ task 'release:stage' => [
 
 task 'release:publish' => [
   'git:push',
-  'gems:push',
+  'gem:push',
   'github:release',
 ]
 

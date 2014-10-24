@@ -13,3 +13,7 @@ group :docs do
   gem 'yard-sitemap', '~> 1.0'
   gem 'rdiscount', require: false
 end
+
+group :release do
+  gem 'octokit'
+end
