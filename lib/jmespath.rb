@@ -12,11 +12,25 @@ module JMESPath
 
   class << self
 
-    # @param [String<JMESPath>] expression
+
+    # @param [String] expression A valid
+    #   [JMESPath](https://github.com/boto/jmespath) expression.
     # @param [Hash] data
-    # @return [Mixed,nil]
+    # @return [Mixed,nil] Returns the matched values. Returns `nil` if the
+    #   expression does not resolve inside `data`.
     def search(expression, data)
+      data = case data
+        when Pathname then load_json(data)
+        when IO, StringIO then MultiJson.load(data.read)
+        else data
+        end
       Runtime.new.search(expression, data)
+    end
+
+    private
+
+    def load_json(path)
+      MultiJson.load(File.open(path, 'r', encoding: 'UTF-8') { |f| f.read })
     end
 
   end
