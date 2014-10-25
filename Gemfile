@@ -6,6 +6,7 @@ gem 'rake', require: false
 
 group :test do
   gem 'rspec', '~> 3.0'
+  gem 'simplecov'
 end
 
 group :docs do
