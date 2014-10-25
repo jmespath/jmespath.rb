@@ -7,6 +7,6 @@ require 'jmespath'
 require 'multi_json'
 
 expression = ARGV[0]
-json = STDIN.read
+json = MultiJson.load(STDIN.read)
 
-MultiJson.dump(JMESPath.search(expression, json))
+$stdout.puts(MultiJson.dump(JMESPath.search(expression, json)))
