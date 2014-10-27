@@ -13,12 +13,6 @@ module JMESPath
       describe 'Hash with Symbol keys' do
       end
 
-      describe 'Arrays' do
-      end
-
-      describe 'Enumerable' do
-      end
-
     end
   end
 end

@@ -31,7 +31,7 @@ module JMESPath
         dispatch(node[:children][1], dispatch(node[:children][0], value))
 
       when :index
-        if array_like?(value)
+        if Array === value
           value[node[:index]]
         else
           nil
@@ -46,7 +46,7 @@ module JMESPath
           projection(left.values, node)
         elsif node[:from] == :object && left == []
           projection(left, node)
-        elsif node[:from] == :array && array_like?(left)
+        elsif node[:from] == :array && Array === left
           projection(left, node)
         else
           nil
@@ -54,9 +54,9 @@ module JMESPath
 
       when :flatten
         value = dispatch(node[:children][0], value)
-        if array_like?(value)
+        if Array === value
           value.inject([]) do |values, v|
-            values + (array_like?(v) ? v : [v])
+            values + (Array === v ? v : [v])
           end
         else
           nil
@@ -130,10 +130,6 @@ module JMESPath
 
     def hash_like?(value)
       Hash === value || Struct === value
-    end
-
-    def array_like?(value)
-      Array === value
     end
 
     def projection(values, node)
@@ -292,7 +288,7 @@ module JMESPath
         value = args.first
         if hash_like?(value)
           value.values
-        elsif array_like?(value)
+        elsif Array === value
           value
         else
           raise Errors::InvalidTypeError, "function values() expects an array or a hash"
@@ -308,7 +304,7 @@ module JMESPath
         values = args[1]
         if !(String === glue)
           raise Errors::InvalidTypeError, "function join() expects the first argument to be a string"
-        elsif array_like?(values) && values.all? { |v| String === v }
+        elsif Array === values && values.all? { |v| String === v }
           values.join(glue)
         else
           raise Errors::InvalidTypeError, "function join() expects values to be an array of strings"
@@ -341,7 +337,7 @@ module JMESPath
     end
 
     def function_sum(*args)
-      if args.count == 1 && array_like?(args.first)
+      if args.count == 1 && Array === args.first
         args.first.inject(0) do |sum,n|
           if Numeric === n
             sum + n
@@ -365,7 +361,7 @@ module JMESPath
     def function_sort(*args)
       if args.count == 1
         value = args.first
-        if array_like?(value)
+        if Array === value
           value.sort do |a, b|
             a_type = get_type(a)
             b_type = get_type(b)
@@ -437,7 +433,7 @@ module JMESPath
     end
 
     def function_slice(values, *args)
-      if String === values || array_like?(values)
+      if String === values || Array === values
         _slice(values, *args)
       else
         nil
@@ -514,7 +510,7 @@ module JMESPath
       when ExprNode === value then 'expression'
       when String === value then 'string'
       when hash_like?(value) then 'object'
-      when array_like?(value) then 'array'
+      when Array === value then 'array'
       when [true, false].include?(value) then 'boolean'
       when value.nil? then 'null'
       when Numeric === value then 'number'
