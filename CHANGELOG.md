@@ -27,6 +27,7 @@ Next Release (TBD)
   )
   JMESPath.search('foo.bar.yuck', data)
   #=> 'value'
+  ```
 
 * Added a simple thread-safe expression parser cache; This significantly speeds
   up searching multiple times with the same expression. This cache is enabled
