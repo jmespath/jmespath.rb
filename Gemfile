@@ -18,3 +18,7 @@ end
 group :release do
   gem 'octokit'
 end
+
+group :benchmark do
+  gem 'absolute_time'
+end

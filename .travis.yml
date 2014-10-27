@@ -1,6 +1,6 @@
 script: bundle exec rake
 
-bundler_args: --without docs release
+bundler_args: --without docs release benchmark
 
 branches:
   only:

@@ -2,6 +2,7 @@ require 'multi_json'
 
 module JMESPath
 
+  autoload :Benchmark, 'jmespath/benchmark'
   autoload :Errors, 'jmespath/errors'
   autoload :ExprNode, 'jmespath/expr_node'
   autoload :Lexer, 'jmespath/lexer'

@@ -14,10 +14,4 @@ RSpec::Core::RakeTask.new('test:compliance') do |t|
   t.pattern = 'compliance_spec.rb'
 end
 
-desc "Run performance tests"
-RSpec::Core::RakeTask.new('test:perf') do |t|
-  t.rspec_opts = "-I lib#{$RSPEC_OPTS}"
-  t.pattern = 'perf_spec.rb'
-end
-
 task 'test' => ['test:unit', 'test:compliance']
