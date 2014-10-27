@@ -21,10 +21,11 @@ module JMESPath
       case node[:type]
 
       when :field
-        if hash_like?(value)
-          value[node[:key]]
-        else
-          nil
+        key = node[:key]
+        case value
+        when Hash then value.key?(key) ? value[key] : value[key.to_sym]
+        when Struct then value[key]
+        else nil
         end
 
       when :subexpression
