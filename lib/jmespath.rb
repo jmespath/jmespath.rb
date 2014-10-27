@@ -20,6 +20,7 @@ module JMESPath
     #   expression does not resolve inside `data`.
     def search(expression, data)
       data = case data
+        when Hash, Struct then data # check for most common case first
         when Pathname then load_json(data)
         when IO, StringIO then MultiJson.load(data.read)
         else data
