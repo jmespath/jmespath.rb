@@ -2,10 +2,10 @@ require 'simplecov'
 require 'jmespath'
 require 'rspec'
 
-SimpleCov.command_name('test:compliance')
+SimpleCov.command_name('test:perf')
 
-describe 'Compliance' do
-  Dir.glob('spec/compliance/*.json').each do |path|
+describe 'Performance' do
+  Dir.glob('spec/perf/*.json').each do |path|
     describe(File.basename(path).split('.').first) do
       JMESPath.load_json(path).each do |scenario|
         describe("Given #{scenario['given'].inspect}") do

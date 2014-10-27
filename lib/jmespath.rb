@@ -30,8 +30,7 @@ module JMESPath
       Runtime.new.search(expression, data)
     end
 
-    private
-
+    # @api private
     def load_json(path)
       MultiJson.load(File.open(path, 'r', encoding: 'UTF-8') { |f| f.read })
     end
