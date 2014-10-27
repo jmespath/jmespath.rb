@@ -25,7 +25,6 @@ module JMESPath
     # @param [String<JMESPath>] expression
     def parse(expression)
       stream = TokenStream.new(expression, @lexer.tokenize(expression))
-      #puts "\n" + stream.inspect + "\n\n"
       result = expr(stream)
       if stream.token.type != :eof
         raise Errors::SyntaxError, "expected :eof got #{stream.token.type}"
@@ -48,10 +47,8 @@ module JMESPath
     # @param [TokenStream] stream
     # @param [Integer] rbp Right binding power
     def expr(stream, rbp = 0)
-      #puts "nud_#{stream.token.type}"
       left = send("nud_#{stream.token.type}", stream)
       while rbp < stream.token.binding_power
-      #puts "#{rbp} #{stream.token.binding_power} led_#{stream.token.type}"
         left = send("led_#{stream.token.type}", stream, left)
       end
       left
