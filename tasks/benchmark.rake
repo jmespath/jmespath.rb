@@ -1,11 +1,14 @@
 require 'jmespath'
 
+desc 'Runs the benchmark suite'
 task 'benchmark' do
 
   require 'absolute_time'
 
-  runtime = JMESPath::Runtime.new(cache_expressions: ENV['CACHE'])
+  runtime = JMESPath::Runtime.new(cache_expressions: !!ENV['CACHE'])
 
+  # The benchmarks are taken from the boto/jmespath project from the
+  # pref/ directory.
   Dir.glob('benchmark/*.json').each do |path|
     JMESPath.load_json(path).first.tap do |scenario|
       scenario['cases'].each do |test_case|
@@ -26,4 +29,9 @@ task 'benchmark' do
       end
     end
   end
+end
+
+desc 'Runs the benchmark suite, with expression caching'
+task 'benchmark:cached' do
+  sh({"CACHE" => "1"}, "bundle exec rake benchmark")
 end

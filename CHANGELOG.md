@@ -1,5 +1,7 @@
-Next Release (TBD)
+Unreleased Changes
 ------------------
+
+* Documented the `rake benchmark` and `rake benchmark:cached` tasks.
 
 * You can now disable expression caching when constructing a Runtime by
   passing `:cache_expressions => false`. Caching is still enabled by
