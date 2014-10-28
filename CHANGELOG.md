@@ -1,4 +1,4 @@
-Unreleased Changes
+1.0.1 (2014-10-28)
 ------------------
 
 * Bug-fix, when accessing Struct objects with an invalid member
