@@ -4,8 +4,7 @@ task 'benchmark' do
 
   require 'absolute_time'
 
-  parser = ENV['CACHE'] ? CachingParser.new : Parser.new
-  runtime = JMESPath::Runtime.new(parser: parser)
+  runtime = JMESPath::Runtime.new(cache_expressions: ENV['CACHE'])
 
   Dir.glob('benchmark/*.json').each do |path|
     JMESPath.load_json(path).first.tap do |scenario|

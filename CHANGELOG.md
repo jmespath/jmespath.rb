@@ -1,6 +1,18 @@
 Next Release (TBD)
 ------------------
 
+* You can now disable expression caching when constructing a Runtime by
+  passing `:cache_expressions => false`. Caching is still enabled by
+  default.
+
+  ```ruby
+  # disable caching
+  runtime = JMESPath::Runtime.new(cache_expressions: false)
+  runtime.search(expression, data)
+  ```
+
+* Adding a missing require statement for Pathname to the JMESPath module.
+
 0.9.0 (2014-10-27)
 ------------------
 
