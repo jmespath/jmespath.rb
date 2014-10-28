@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Bug-fix, when accessing Struct objects with an invalid member
+  `nil` is now returned, instead of raising an error.
+
 1.0.0 (2014-10-28)
 ------------------
 
