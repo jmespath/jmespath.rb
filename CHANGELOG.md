@@ -1,4 +1,4 @@
-Unreleased Changes
+1.0.0 (2014-10-28)
 ------------------
 
 * The expression cache now has a maximum size.
