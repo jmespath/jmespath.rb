@@ -1,7 +1,9 @@
 require 'multi_json'
+require 'pathname'
 
 module JMESPath
 
+  autoload :CachingParser, 'jmespath/caching_parser'
   autoload :Errors, 'jmespath/errors'
   autoload :ExprNode, 'jmespath/expr_node'
   autoload :Lexer, 'jmespath/lexer'

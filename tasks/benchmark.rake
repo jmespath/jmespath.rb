@@ -4,13 +4,8 @@ task 'benchmark' do
 
   require 'absolute_time'
 
-  if !ENV['CACHE']
-    class JMESPath::Runtime
-      def parse(expression)
-        @parser.parse(expression)
-      end
-    end
-  end
+  parser = ENV['CACHE'] ? CachingParser.new : Parser.new
+  runtime = JMESPath::Runtime.new(parser: parser)
 
   Dir.glob('benchmark/*.json').each do |path|
     JMESPath.load_json(path).first.tap do |scenario|
@@ -21,7 +16,7 @@ task 'benchmark' do
 
         time = 1_000.times.inject(9999) do |best, _|
           started = AbsoluteTime.now
-          JMESPath.search(expression, data)
+          runtime.search(expression, data)
           stopped = AbsoluteTime.now
           [stopped - started, best].min
         end
