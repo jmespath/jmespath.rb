@@ -43,6 +43,8 @@ JMESPath.search('foo.bar', { abc: "mno" })
 #=> nil
 ```
 
+**[See the JMESPath specification for a full list of supported search expressions.](http://jmespath.readthedocs.org/en/latest/specification.html#examples)**
+
 ## Indifferent Access
 
 The examples above show JMESPath expressions used to search over hashes with symbolized keys. You can use search also for hashes with string keys or Struct objects.
@@ -74,6 +76,8 @@ end
 
 * [Release Notes](https://github.com/trevorrowe/jmespath.rb/releases)
 * [License](http://www.apache.org/licenses/LICENSE-2.0)
+* [JMESPath Examples](http://jmespath.readthedocs.org/en/latest/specification.html#examples)
+* [JMESPath Specification](http://jmespath.readthedocs.org/en/latest/specification.html)
 
 ## License
 
