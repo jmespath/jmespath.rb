@@ -1,6 +1,8 @@
 Unreleased Changes
 ------------------
 
+* The expression cache now has a maximum size.
+
 * Documented the `rake benchmark` and `rake benchmark:cached` tasks.
 
 * You can now disable expression caching when constructing a Runtime by

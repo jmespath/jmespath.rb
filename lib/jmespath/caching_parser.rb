@@ -13,7 +13,16 @@ module JMESPath
       if cached = @cache[expression]
         cached
       else
-        @mutex.synchronize { @cache[expression] = @parser.parse(expression) }
+        cache_expression(expression)
+      end
+    end
+
+    private
+
+    def cache_expression(expression)
+      @mutex.synchronize do
+        @cache.clear if @cache.size > 1000
+        @cache[expression] = @parser.parse(expression)
       end
     end
 
