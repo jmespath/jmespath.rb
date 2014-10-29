@@ -19,8 +19,8 @@ Call `JMESPath.search` with a valid JMESPath search expression and data to searc
 ```ruby
 require 'jmespath'
 
-JMESPath.search('foo.bar', { foo: { bar: { yuck: "value" }}})
-#=> "value"
+JMESPath.search('foo.bar', { foo: { bar: { baz: "value" }}})
+#=> {baz: "value"}
 ```
 
 In addition to accessing nested values, you can exact values from arrays.
