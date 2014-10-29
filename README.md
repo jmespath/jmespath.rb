@@ -20,7 +20,7 @@ Call `JMESPath.search` with a valid JMESPath search expression and data to searc
 require 'jmespath'
 
 JMESPath.search('foo.bar', { foo: { bar: { yuck: "value" }}})
-#=> "yuck"
+#=> "value"
 ```
 
 In addition to accessing nested values, you can exact values from arrays.
