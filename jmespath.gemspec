@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'jmespath'
   spec.version       = version
   spec.summary       = 'JMESPath - Ruby Edition'
-  spec.description   = 'Implementes JMESPath for Ruby'
+  spec.description   = 'Implements JMESPath for Ruby'
   spec.author        = 'Trevor Rowe'
   spec.email         = 'trevorrowe@gmail.com'
   spec.homepage      = 'http://github.com/trevorrowe/jmespath.rb'
