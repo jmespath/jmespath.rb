@@ -8,6 +8,6 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'http://github.com/trevorrowe/jmespath.rb'
   spec.license       = 'Apache 2.0'
   spec.require_paths = ['lib']
-  spec.files         = Dir['lib/**/*.rb']
+  spec.files         = Dir['lib/**/*.rb'] + ['LICENSE.txt']
   spec.add_dependency('multi_json', '~> 1.0')
 end

@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Added a copy of the Apache 2.0 license to the project and now
+  now bundling the license as part of the release.
+
 1.0.1 (2014-10-28)
 ------------------
 
