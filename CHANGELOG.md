@@ -1,4 +1,4 @@
-Unreleased Changes
+1.0.2 (2014-12-04)
 ------------------
 
 * Added a copy of the Apache 2.0 license to the project and now
