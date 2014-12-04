@@ -20,6 +20,7 @@ task 'release:stage' => [
   'github:require-access-token',
   'git:require-clean-workspace',
   'test:unit',
+  'test:compliance',
   'changelog:version',
   'release:bump-version',
   'git:tag',

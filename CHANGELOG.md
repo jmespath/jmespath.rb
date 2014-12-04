@@ -1,6 +1,8 @@
 Unreleased Changes
 ------------------
 
+* Now running compliance tests as part of release process.
+
 1.0.2 (2014-12-04)
 ------------------
 
