@@ -69,19 +69,19 @@ module JMESPath
           if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
             values = args[0]
             expression = args[1]
-            args[0].send("#{mode}_by") do |entry|
+            args[0].send(mode) do |entry|
               value = expression.eval(entry)
               if get_type(value) == NUMBER_TYPE
                 value
               else
-                raise Errors::InvalidTypeError, "function #{mode}_by() expects values to be an numbers"
+                raise Errors::InvalidTypeError, "function #{mode}() expects values to be an numbers"
               end
             end
           else
-            raise Errors::InvalidTypeError, "function #{mode}_by() expects an array and an expression"
+            raise Errors::InvalidTypeError, "function #{mode}() expects an array and an expression"
           end
         else
-          raise Errors::InvalidArityError, "function #{mode}_by() expects two arguments"
+          raise Errors::InvalidArityError, "function #{mode}() expects two arguments"
         end
       end
     end
@@ -427,7 +427,7 @@ module JMESPath
       FUNCTIONS['max_by'] = self
 
       def call(args)
-        number_compare(:max, *args)
+        number_compare(:max_by, *args)
       end
     end
 
@@ -435,7 +435,7 @@ module JMESPath
       FUNCTIONS['min_by'] = self
 
       def call(args)
-        number_compare(:min, *args)
+        number_compare(:min_by, *args)
       end
     end
   end
