@@ -8,6 +8,10 @@ module JMESPath
       def hash_like?(value)
         Hash === value || Struct === value
       end
+
+      def optimize
+        self
+      end
     end
 
     autoload :Comparator, 'jmespath/nodes/comparator'
