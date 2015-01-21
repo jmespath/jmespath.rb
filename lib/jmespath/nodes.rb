@@ -24,6 +24,8 @@ module JMESPath
     autoload :Or, 'jmespath/nodes/or'
     autoload :Pipe, 'jmespath/nodes/pipe'
     autoload :Projection, 'jmespath/nodes/projection'
+    autoload :ArrayProjection, 'jmespath/nodes/projection'
+    autoload :ObjectProjection, 'jmespath/nodes/projection'
     autoload :Slice, 'jmespath/nodes/slice'
     autoload :Subexpression, 'jmespath/nodes/subexpression'
   end
