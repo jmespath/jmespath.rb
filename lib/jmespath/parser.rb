@@ -206,8 +206,8 @@ module JMESPath
 
     def led_pipe(stream, left)
       stream.next
-      children = [left, expr(stream, Token::BINDING_POWER[:pipe])]
-      Nodes::Pipe.new(children)
+      right = expr(stream, Token::BINDING_POWER[:pipe])
+      Nodes::Pipe.new(left, right)
     end
 
     def parse_array_index_expression(stream)
