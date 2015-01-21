@@ -10,13 +10,6 @@ module JMESPath
       def visit(value)
         @right.visit(@left.visit(value))
       end
-
-      def to_h
-        {
-          :type => :subexpression,
-          :children => [@left.to_h, @right.to_h],
-        }
-      end
     end
   end
 end

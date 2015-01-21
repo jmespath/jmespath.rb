@@ -9,13 +9,6 @@ module JMESPath
       def visit(value)
         @value
       end
-
-      def to_h
-        {
-          :type => :literal,
-          :value => @value,
-        }
-      end
     end
   end
 end

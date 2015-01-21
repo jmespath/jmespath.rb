@@ -14,13 +14,6 @@ module JMESPath
           nil
         end
       end
-
-      def to_h
-        {
-          :type => :condition,
-          :children => [@test.to_h, @child.to_h],
-        }
-      end
     end
   end
 end

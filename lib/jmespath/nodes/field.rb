@@ -13,13 +13,6 @@ module JMESPath
         else nil
         end
       end
-
-      def to_h
-        {
-          :type => :field,
-          :key => @key,
-        }
-      end
     end
   end
 end

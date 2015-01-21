@@ -20,14 +20,6 @@ module JMESPath
         call(@children.map { |child| child.visit(value) })
       end
 
-      def to_h
-        {
-          :type => :function,
-          :children => @children.map(&:to_h),
-          :fn => @fn,
-        }
-      end
-
       class FunctionName
         attr_reader :name
 

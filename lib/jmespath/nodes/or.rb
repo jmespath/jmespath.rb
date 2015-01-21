@@ -15,13 +15,6 @@ module JMESPath
           result
         end
       end
-
-      def to_h
-        {
-          :type => :or,
-          :children => [@left.to_h, @right.to_h],
-        }
-      end
     end
   end
 end
