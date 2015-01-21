@@ -48,7 +48,8 @@ module JMESPath
     # @param [Hash] data
     # @return [Mixed,nil]
     def search(expression, data)
-      @parser.parse(expression).visit(data)
+      optimized_expression = @parser.parse(expression).optimize
+      optimized_expression.visit(data)
     end
 
     private
