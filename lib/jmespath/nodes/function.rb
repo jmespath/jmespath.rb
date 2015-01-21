@@ -2,14 +2,22 @@ module JMESPath
   # @api private
   module Nodes
     class Function < Node
-      def initialize(children, fn)
+      FUNCTIONS = {}
+
+      def initialize(children)
         @children = children
-        @fn = fn
+      end
+
+      def self.create(name, children)
+        if (type = FUNCTIONS[name])
+          type.new(children)
+        else
+          raise Errors::UnknownFunctionError, "unknown function #{name}()"
+        end
       end
 
       def visit(value)
-        args = @children.map { |child| child.visit(value) }
-        send("function_#{@fn}", *args)
+        call(@children.map { |child| child.visit(value) })
       end
 
       def to_h
@@ -30,12 +38,8 @@ module JMESPath
 
       private
 
-      def method_missing(method_name, *args)
-        if matches = method_name.to_s.match(/^function_(.*)/)
-          raise Errors::UnknownFunctionError, "unknown function #{matches[1]}()"
-        else
-          super
-        end
+      def call(args)
+        nil
       end
 
       def get_type(value)
@@ -70,8 +74,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function #{mode}_by() expects two arguments"
         end
       end
+    end
 
-      def function_abs(*args)
+    class AbsFunction < Function
+      FUNCTIONS['abs'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
         else
@@ -83,8 +91,12 @@ module JMESPath
           raise Errors::InvalidTypeError, "function abs() expects a number"
         end
       end
+    end
 
-      def function_avg(*args)
+    class AvgFunction < Function
+      FUNCTIONS['avg'] = self
+
+      def call(args)
         if args.count == 1
           values = args.first
         else
@@ -102,8 +114,12 @@ module JMESPath
           raise Errors::InvalidTypeError, "function avg() expects a number"
         end
       end
+    end
 
-      def function_ceil(*args)
+    class CeilFunction < Function
+      FUNCTIONS['ceil'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
         else
@@ -115,8 +131,12 @@ module JMESPath
           raise Errors::InvalidTypeError, "function ceil() expects a numeric value"
         end
       end
+    end
 
-      def function_contains(*args)
+    class ContainsFunction < Function
+      FUNCTIONS['contains'] = self
+
+      def call(args)
         if args.count == 2
           if String === args[0] || Array === args[0]
             args[0].include?(args[1])
@@ -127,8 +147,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function contains() expects 2 arguments"
         end
       end
+    end
 
-      def function_floor(*args)
+    class FloorFunction < Function
+      FUNCTIONS['floor'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
         else
@@ -140,8 +164,12 @@ module JMESPath
           raise Errors::InvalidTypeError, "function floor() expects a numeric value"
         end
       end
+    end
 
-      def function_length(*args)
+    class LengthFunction < Function
+      FUNCTIONS['length'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
         else
@@ -152,8 +180,12 @@ module JMESPath
         else raise Errors::InvalidTypeError, "function length() expects string, array or object"
         end
       end
+    end
 
-      def function_max(*args)
+    class MaxFunction < Function
+      FUNCTIONS['max'] = self
+
+      def call(args)
         if args.count == 1
           values = args.first
         else
@@ -171,8 +203,12 @@ module JMESPath
           raise Errors::InvalidTypeError, "function max() expects an array"
         end
       end
+    end
 
-      def function_min(*args)
+    class MinFunction < Function
+      FUNCTIONS['min'] = self
+
+      def call(args)
         if args.count == 1
           values = args.first
         else
@@ -190,16 +226,24 @@ module JMESPath
           raise Errors::InvalidTypeError, "function min() expects an array"
         end
       end
+    end
 
-      def function_type(*args)
+    class TypeFunction < Function
+      FUNCTIONS['type'] = self
+
+      def call(args)
         if args.count == 1
           get_type(args.first)
         else
           raise Errors::InvalidArityError, "function type() expects one argument"
         end
       end
+    end
 
-      def function_keys(*args)
+    class KeysFunction < Function
+      FUNCTIONS['keys'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
           if hash_like?(value)
@@ -215,8 +259,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function keys() expects one argument"
         end
       end
+    end
 
-      def function_values(*args)
+    class ValuesFunction < Function
+      FUNCTIONS['values'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
           if hash_like?(value)
@@ -230,8 +278,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function values() expects one argument"
         end
       end
+    end
 
-      def function_join(*args)
+    class JoinFunction < Function
+      FUNCTIONS['join'] = self
+
+      def call(args)
         if args.count == 2
           glue = args[0]
           values = args[1]
@@ -246,8 +298,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function join() expects an array of strings"
         end
       end
+    end
 
-      def function_to_string(*args)
+    class ToStringFunction < Function
+      FUNCTIONS['to_string'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
           String === value ? value : MultiJson.dump(value)
@@ -255,8 +311,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function to_string() expects one argument"
         end
       end
+    end
 
-      def function_to_number(*args)
+    class ToNumberFunction < Function
+      FUNCTIONS['to_number'] = self
+
+      def call(args)
         if args.count == 1
           begin
             value = Float(args.first)
@@ -268,8 +328,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function to_number() expects one argument"
         end
       end
+    end
 
-      def function_sum(*args)
+    class SumFunction < Function
+      FUNCTIONS['sum'] = self
+
+      def call(args)
         if args.count == 1 && Array === args.first
           args.first.inject(0) do |sum,n|
             if Numeric === n
@@ -282,16 +346,24 @@ module JMESPath
           raise Errors::InvalidArityError, "function sum() expects one argument"
         end
       end
+    end
 
-      def function_not_null(*args)
+    class NotNullFunction < Function
+      FUNCTIONS['not_null'] = self
+
+      def call(args)
         if args.count > 0
           args.find { |value| !value.nil? }
         else
           raise Errors::InvalidArityError, "function not_null() expects one or more arguments"
         end
       end
+    end
 
-      def function_sort(*args)
+    class SortFunction < Function
+      FUNCTIONS['sort'] = self
+
+      def call(args)
         if args.count == 1
           value = args.first
           if Array === value
@@ -311,8 +383,12 @@ module JMESPath
           raise Errors::InvalidArityError, "function sort() expects one argument"
         end
       end
+    end
 
-      def function_sort_by(*args)
+    class SortByFunction < Function
+      FUNCTIONS['sort_by'] = self
+
+      def call(args)
         if args.count == 2
           if get_type(args[0]) == 'array' && get_type(args[1]) == 'expression'
             values = args[0]
@@ -335,12 +411,20 @@ module JMESPath
           raise Errors::InvalidArityError, "function sort_by() expects two arguments"
         end
       end
+    end
 
-      def function_max_by(*args)
+    class MaxByFunction < Function
+      FUNCTIONS['max_by'] = self
+
+      def call(args)
         number_compare(:max, *args)
       end
+    end
 
-      def function_min_by(*args)
+    class MinByFunction < Function
+      FUNCTIONS['min_by'] = self
+
+      def call(args)
         number_compare(:min, *args)
       end
     end

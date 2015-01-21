@@ -188,7 +188,7 @@ module JMESPath
         end
       end
       stream.next
-      Nodes::Function.new(args, name)
+      Nodes::Function.create(name, args)
     end
 
     def led_or(stream, left)
