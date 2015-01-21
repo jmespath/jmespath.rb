@@ -156,14 +156,14 @@ module JMESPath
       rhs = parse_projection(stream, Token::BINDING_POWER[:filter])
       left ||= CURRENT_NODE
       right = Nodes::Condition.new(expression, rhs)
-      Nodes::Projection.new(left, right, :array)
+      Nodes::ArrayProjection.new(left, right)
     end
 
     def led_flatten(stream, left)
       stream.next
       left = Nodes::Flatten.new(left)
       right = parse_projection(stream, Token::BINDING_POWER[:flatten])
-      Nodes::Projection.new(left, right, :array)
+      Nodes::ArrayProjection.new(left, right)
     end
 
     def led_lbracket(stream, left)
@@ -274,14 +274,14 @@ module JMESPath
       stream.next
       left ||= CURRENT_NODE
       right = parse_projection(stream, Token::BINDING_POWER[:star])
-      Nodes::Projection.new(left, right, :array)
+      Nodes::ArrayProjection.new(left, right)
     end
 
     def parse_wildcard_object(stream, left = nil)
       stream.next
       left ||= CURRENT_NODE
       right = parse_projection(stream, Token::BINDING_POWER[:star])
-      Nodes::Projection.new(left, right, :object)
+      Nodes::ObjectProjection.new(left, right)
     end
 
   end
