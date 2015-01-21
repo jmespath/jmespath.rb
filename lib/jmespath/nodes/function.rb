@@ -20,6 +20,14 @@ module JMESPath
         }
       end
 
+      class FunctionName
+        attr_reader :name
+
+        def initialize(name)
+          @name = name
+        end
+      end
+
       private
 
       def method_missing(method_name, *args)

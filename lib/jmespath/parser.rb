@@ -74,8 +74,12 @@ module JMESPath
 
     def nud_identifier(stream)
       token = stream.token
-      stream.next
-      Nodes::Field.new(token.value)
+      n = stream.next
+      if n.type == :lparen
+        Nodes::Function::FunctionName.new(token.value)
+      else
+        Nodes::Field.new(token.value)
+      end
     end
 
     def nud_lbrace(stream)
@@ -182,7 +186,7 @@ module JMESPath
 
     def led_lparen(stream, left)
       args = []
-      name = left.key
+      name = left.name
       stream.next
       while stream.token.type != :rparen
         args << expr(stream, 0)
