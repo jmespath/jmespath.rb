@@ -66,10 +66,10 @@ module JMESPath
 
       def number_compare(mode, *args)
         if args.count == 2
-          if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
-            values = args[0]
-            expression = args[1]
-            args[0].send(mode) do |entry|
+          values = args[0]
+          expression = args[1]
+          if get_type(values) == ARRAY_TYPE && get_type(expression) == EXPRESSION_TYPE
+            values.send(mode) do |entry|
               value = expression.eval(entry)
               if get_type(value) == NUMBER_TYPE
                 value
@@ -148,8 +148,10 @@ module JMESPath
 
       def call(args)
         if args.count == 2
-          if String === args[0] || Array === args[0]
-            args[0].include?(args[1])
+          haystack = args[0]
+          needle = args[1]
+          if String === haystack || Array === haystack
+            haystack.include?(needle)
           else
             raise Errors::InvalidTypeError, "contains expects 2nd arg to be a list"
           end
