@@ -9,7 +9,26 @@ module JMESPath
       end
 
       def visit(value)
-        function_slice(value, *@args)
+        if String === value || Array === value
+          start, stop, step = adjust_slice(value.size, *@args)
+          result = []
+          if step > 0
+            i = start
+            while i < stop
+              result << value[i]
+              i += step
+            end
+          else
+            i = start
+            while i > stop
+              result << value[i]
+              i += step
+            end
+          end
+          String === value ? result.join : result
+        else
+          nil
+        end
       end
 
       def to_h
@@ -21,34 +40,7 @@ module JMESPath
 
       private
 
-      def function_slice(values, *args)
-        if String === values || Array === values
-          _slice(values, *args)
-        else
-          nil
-        end
-      end
-
-      def _slice(values, start, stop, step)
-        start, stop, step = _adjust_slice(values.size, start, stop, step)
-        result = []
-        if step > 0
-          i = start
-          while i < stop
-            result << values[i]
-            i += step
-          end
-        else
-          i = start
-          while i > stop
-            result << values[i]
-            i += step
-          end
-        end
-        String === values ? result.join : result
-      end
-
-      def _adjust_slice(length, start, stop, step)
+      def adjust_slice(length, start, stop, step)
         if step.nil?
           step = 1
         elsif step == 0
@@ -58,19 +50,19 @@ module JMESPath
         if start.nil?
           start = step < 0 ? length - 1 : 0
         else
-          start = _adjust_endpoint(length, start, step)
+          start = adjust_endpoint(length, start, step)
         end
 
         if stop.nil?
           stop = step < 0 ? -1 : length
         else
-          stop = _adjust_endpoint(length, stop, step)
+          stop = adjust_endpoint(length, stop, step)
         end
 
         [start, stop, step]
       end
 
-      def _adjust_endpoint(length, endpoint, step)
+      def adjust_endpoint(length, endpoint, step)
         if endpoint < 0
           endpoint += length
           endpoint = 0 if endpoint < 0
@@ -81,7 +73,6 @@ module JMESPath
           endpoint
         end
       end
-
     end
   end
 end
