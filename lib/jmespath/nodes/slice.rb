@@ -1,8 +1,6 @@
 module JMESPath
   # @api private
   module Nodes
-      attr_reader :args
-
     class Slice < Leaf
       def initialize(args)
         @args = args

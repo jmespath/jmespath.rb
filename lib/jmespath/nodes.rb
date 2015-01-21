@@ -2,8 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class Node
-      attr_reader :children
-
       def initialize(children)
         @children = children
       end
