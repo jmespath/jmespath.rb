@@ -43,14 +43,14 @@ module JMESPath
       end
 
       def get_type(value)
-        case
-        when Expression === value then 'expression'
-        when String === value then 'string'
-        when hash_like?(value) then 'object'
-        when Array === value then 'array'
-        when [true, false].include?(value) then 'boolean'
-        when value.nil? then 'null'
-        when Numeric === value then 'number'
+        case value
+        when String then 'string'
+        when true, false then 'boolean'
+        when nil then 'null'
+        when Numeric then 'number'
+        when Hash, Struct then 'object'
+        when Array then 'array'
+        when Expression then 'expression'
         end
       end
 
