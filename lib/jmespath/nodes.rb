@@ -12,6 +12,10 @@ module JMESPath
       def optimize
         self
       end
+
+      def chains_with?(other)
+        false
+      end
     end
 
     autoload :Comparator, 'jmespath/nodes/comparator'

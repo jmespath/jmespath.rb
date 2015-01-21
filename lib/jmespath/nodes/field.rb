@@ -14,6 +14,10 @@ module JMESPath
         end
       end
 
+      def chains_with?(other)
+        other.is_a?(Field)
+      end
+
       def chain(other)
         ChainedField.new([@key, *other.keys])
       end
