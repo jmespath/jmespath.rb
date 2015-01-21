@@ -1,15 +1,20 @@
 module JMESPath
   # @api private
   module Nodes
-    class Pipe < Node
+    class Pipe < Leaf
+      def initialize(left, right)
+        @left = left
+        @right = right
+      end
+
       def visit(value)
-        @children[1].visit(@children[0].visit(value))
+        @right.visit(@left.visit(value))
       end
 
       def to_h
         {
           :type => :pipe,
-          :children => @children.map(&:to_h),
+          :children => [@left.to_h, @right.to_h],
         }
       end
     end
