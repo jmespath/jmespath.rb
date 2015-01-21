@@ -2,19 +2,16 @@ module JMESPath
   # @api private
   module Nodes
     class Projection < Node
-      def initialize(left, right)
-        @left = left
-        @right = right
+      def initialize(target, projection)
+        @target = target
+        @projection = projection
       end
 
       def visit(value)
-        # Interprets a projection node, passing the values of the left
-        # child through the values of the right child and aggregating
-        # the non-null results into the return value.
-        if (projectees = extract_projectees(@left.visit(value)))
+        if (targets = extract_targets(@target.visit(value)))
           list = []
-          projectees.each do |v|
-            if (vv = @right.visit(v))
+          targets.each do |v|
+            if (vv = @projection.visit(v))
               list << vv
             end
           end
@@ -24,15 +21,15 @@ module JMESPath
 
       private
 
-      def extract_projectees(left_value)
+      def extract_targets(left_value)
         nil
       end
     end
 
     class ArrayProjection < Projection
-      def extract_projectees(left_value)
-        if Array === left_value
-          left_value
+      def extract_targets(target)
+        if Array === target
+          target
         else
           nil
         end
@@ -42,11 +39,11 @@ module JMESPath
     class ObjectProjection < Projection
       EMPTY_ARRAY = [].freeze
 
-      def extract_projectees(left_value)
-        if hash_like?(left_value)
-          left_value.values
-        elsif left_value == EMPTY_ARRAY
-          left_value
+      def extract_targets(target)
+        if hash_like?(target)
+          target.values
+        elsif target == EMPTY_ARRAY
+          EMPTY_ARRAY
         else
           nil
         end
