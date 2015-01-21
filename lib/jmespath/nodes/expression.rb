@@ -2,14 +2,18 @@ module JMESPath
   # @api private
   module Nodes
     class Expression < Node
-      attr_reader :node
+      attr_reader :expression
 
-      def initialize(node)
-        @node = node
+      def initialize(expression)
+        @expression = expression
       end
 
       def visit(value)
         self
+      end
+
+      def eval(value)
+        @expression.visit(value)
       end
     end
   end

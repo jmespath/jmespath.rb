@@ -52,7 +52,7 @@ module JMESPath
             values = args[0]
             expression = args[1]
             args[0].send("#{mode}_by") do |entry|
-              value = expression.node.visit(entry)
+              value = expression.eval(entry)
               if get_type(value) == 'number'
                 value
               else
@@ -386,8 +386,8 @@ module JMESPath
             values = args[0]
             expression = args[1]
             values.sort do |a,b|
-              a_value = expression.node.visit(a)
-              b_value = expression.node.visit(b)
+              a_value = expression.eval(a)
+              b_value = expression.eval(b)
               a_type = get_type(a_value)
               b_type = get_type(b_value)
               if ['string', 'number'].include?(a_type) && a_type == b_type
