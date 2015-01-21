@@ -11,7 +11,8 @@ module JMESPath
         if (targets = extract_targets(@target.visit(value)))
           list = []
           targets.each do |v|
-            if (vv = @projection.visit(v))
+            vv = @projection.visit(v)
+            unless vv.nil?
               list << vv
             end
           end
