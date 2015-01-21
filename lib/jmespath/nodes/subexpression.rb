@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Subexpression < Leaf
+    class Subexpression < Node
       def initialize(left, right)
         @left = left
         @right = right

@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Projection < Leaf
+    class Projection < Node
       def initialize(left, right, from)
         @left = left
         @right = right

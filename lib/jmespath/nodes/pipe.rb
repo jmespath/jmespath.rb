@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Pipe < Leaf
+    class Pipe < Node
       def initialize(left, right)
         @left = left
         @right = right

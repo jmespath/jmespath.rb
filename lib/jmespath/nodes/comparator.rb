@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Comparator < Leaf
+    class Comparator < Node
       def initialize(left, right, relation)
         @left = left
         @right = right

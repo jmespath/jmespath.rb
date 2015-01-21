@@ -2,6 +2,10 @@ module JMESPath
   # @api private
   module Nodes
     class MultiSelectHash < Node
+      def initialize(children)
+        @children = children
+      end
+
       def visit(value)
         if value.nil?
           nil

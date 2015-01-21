@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Field < Leaf
+    class Field < Node
       def initialize(key)
         @key = key
       end

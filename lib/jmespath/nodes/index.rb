@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Index < Leaf
+    class Index < Node
       def initialize(index)
         @index = index
       end
