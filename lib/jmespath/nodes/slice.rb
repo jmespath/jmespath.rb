@@ -31,6 +31,14 @@ module JMESPath
         end
       end
 
+      def optimize
+        if (@step.nil? || @step == 1) && @start && @stop && @start > 0 && @stop > @start
+          SimpleSlice.new(@start, @stop)
+        else
+          self
+        end
+      end
+
       private
 
       def adjust_slice(length, start, stop, step)
@@ -64,6 +72,20 @@ module JMESPath
           step < 0 ? length - 1 : length
         else
           endpoint
+        end
+      end
+    end
+
+    class SimpleSlice < Slice
+      def initialize(start, stop)
+        super(start, stop, 1)
+      end
+
+      def visit(value)
+        if String === value || Array === value
+          value[@start, @stop - @start]
+        else
+          nil
         end
       end
     end
