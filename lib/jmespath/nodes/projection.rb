@@ -53,7 +53,7 @@ module JMESPath
       end
 
       def fast_instance
-        FastArrayProjection.new(@target.optimize, @projection)
+        FastArrayProjection.new(@target.optimize, @projection.optimize)
       end
     end
 
@@ -75,7 +75,7 @@ module JMESPath
       end
 
       def fast_instance
-        FastObjectProjection.new(@target.optimize, @projection)
+        FastObjectProjection.new(@target.optimize, @projection.optimize)
       end
     end
 
