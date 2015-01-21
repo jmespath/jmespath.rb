@@ -200,8 +200,8 @@ module JMESPath
 
     def led_or(stream, left)
       stream.next
-      children = [left, expr(stream, Token::BINDING_POWER[:or])]
-      Nodes::Or.new(children)
+      right = expr(stream, Token::BINDING_POWER[:or])
+      Nodes::Or.new(left, right)
     end
 
     def led_pipe(stream, left)
