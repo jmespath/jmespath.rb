@@ -2,22 +2,22 @@ module JMESPath
   # @api private
   module Nodes
     class MultiSelectHash < Node
-      def initialize(children)
-        @children = children
+      def initialize(kv_pairs)
+        @kv_pairs = kv_pairs
       end
 
       def visit(value)
         if value.nil?
           nil
         else
-          @children.each_with_object({}) do |pair, hash|
+          @kv_pairs.each_with_object({}) do |pair, hash|
             hash[pair.key] = pair.value.visit(value)
           end
         end
       end
 
       def optimize
-        self.class.new(@children.map(&:optimize))
+        self.class.new(@kv_pairs.map(&:optimize))
       end
 
       class KeyValuePair
