@@ -244,7 +244,7 @@ module JMESPath
       key = stream.token.value
       stream.next(match:Set.new([:colon]))
       stream.next
-      Nodes::MultiSelectHash::KeyValuePair.new([expr(stream)], key)
+      Nodes::MultiSelectHash::KeyValuePair.new(key, expr(stream))
     end
 
     def parse_multi_select_list(stream)
