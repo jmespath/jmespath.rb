@@ -6,8 +6,8 @@ module JMESPath
         if value.nil?
           nil
         else
-          @children.each_with_object({}) do |child, hash|
-            hash[child.key] = child.children[0].visit(value)
+          @children.each_with_object({}) do |pair, hash|
+            hash[pair.key] = pair.value.visit(value)
           end
         end
       end
@@ -20,17 +20,17 @@ module JMESPath
       end
 
       class KeyValuePair
-        attr_reader :children, :key
+        attr_reader :key, :value
 
-        def initialize(children, key)
-          @children = children
+        def initialize(key, value)
           @key = key
+          @value = value
         end
 
         def to_h
           {
             :type => :key_value_pair,
-            :children => @children.map(&:to_h),
+            :children => [@value.to_h],
             :key => @key,
           }
         end
