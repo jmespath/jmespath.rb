@@ -2,13 +2,15 @@ module JMESPath
   # @api private
   module Nodes
     class Slice < Node
-      def initialize(args)
-        @args = args
+      def initialize(start, stop, step)
+        @start = start
+        @stop = stop
+        @step = step
       end
 
       def visit(value)
         if String === value || Array === value
-          start, stop, step = adjust_slice(value.size, *@args)
+          start, stop, step = adjust_slice(value.size, @start, @stop, @step)
           result = []
           if step > 0
             i = start
