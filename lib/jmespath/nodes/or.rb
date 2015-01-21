@@ -1,11 +1,16 @@
 module JMESPath
   # @api private
   module Nodes
-    class Or < Node
+    class Or < Leaf
+      def initialize(left, right)
+        @left = left
+        @right = right
+      end
+
       def visit(value)
-        result = @children[0].visit(value)
+        result = @left.visit(value)
         if result.nil? or result.empty?
-          @children[1].visit(value)
+          @right.visit(value)
         else
           result
         end
@@ -14,7 +19,7 @@ module JMESPath
       def to_h
         {
           :type => :or,
-          :children => @children.map(&:to_h),
+          :children => [@left.to_h, @right.to_h],
         }
       end
     end
