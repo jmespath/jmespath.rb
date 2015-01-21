@@ -1,10 +1,15 @@
 module JMESPath
   # @api private
   module Nodes
-    class Condition < Node
+    class Condition < Leaf
+      def initialize(test, child)
+        @test = test
+        @child = child
+      end
+
       def visit(value)
-        if @children[0].visit(value)
-          @children[1].visit(value)
+        if @test.visit(value)
+          @child.visit(value)
         else
           nil
         end
@@ -13,7 +18,7 @@ module JMESPath
       def to_h
         {
           :type => :condition,
-          :children => @children.map(&:to_h),
+          :children => [@test.to_h, @child.to_h],
         }
       end
     end

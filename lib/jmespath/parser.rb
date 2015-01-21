@@ -156,7 +156,7 @@ module JMESPath
       rhs = parse_projection(stream, Token::BINDING_POWER[:filter])
       children = [
         left ? left : CURRENT_NODE,
-        Nodes::Condition.new([expression, rhs])
+        Nodes::Condition.new(expression, rhs)
       ]
       Nodes::Projection.new(children, :array)
     end
