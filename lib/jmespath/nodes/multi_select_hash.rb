@@ -6,7 +6,7 @@ module JMESPath
         if value.nil?
           nil
         else
-          @children.each.with_object({}) do |child, hash|
+          @children.each_with_object({}) do |child, hash|
             hash[child.key] = child.children[0].visit(value)
           end
         end
