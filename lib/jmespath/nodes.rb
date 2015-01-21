@@ -17,6 +17,10 @@ module JMESPath
     class Leaf
       def visit(value)
       end
+
+      def hash_like?(value)
+        Hash === value || Struct === value
+      end
     end
 
     autoload :Comparator, 'jmespath/nodes/comparator'
