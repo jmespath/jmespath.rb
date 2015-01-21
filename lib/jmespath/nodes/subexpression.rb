@@ -49,7 +49,7 @@ module JMESPath
         children = @children.map(&:optimize)
         index = 0
         while index < children.size - 1
-          if children[index].is_a?(Field) && children[index + 1].is_a?(Field)
+          if children[index].chains_with?(children[index + 1])
             children[index] = children[index].chain(children[index + 1])
             children.delete_at(index + 1)
           else
