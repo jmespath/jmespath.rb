@@ -2,10 +2,10 @@ module JMESPath
   # @api private
   module Nodes
     class Comparator < Node
-      attr_reader :children, :relation
+      attr_reader :relation
 
       def initialize(children, relation)
-        @children = children
+        super(children)
         @relation = relation
       end
 

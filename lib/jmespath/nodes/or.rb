@@ -2,12 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class Or < Node
-      attr_reader :children
-
-      def initialize(children)
-        @children = children
-      end
-
       def visit(value)
         result = @children[0].visit(value)
         if result.nil? or result.empty?

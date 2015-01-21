@@ -2,12 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class MultiSelectList < Node
-      attr_reader :children
-
-      def initialize(children)
-        @children = children
-      end
-
       def visit(value)
         if value.nil?
           value

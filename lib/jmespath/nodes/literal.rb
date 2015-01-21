@@ -1,9 +1,9 @@
 module JMESPath
   # @api private
   module Nodes
-    class Literal < Node
       attr_reader :value
 
+    class Literal < Leaf
       def initialize(value)
         @value = value
       end

@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Field < Node
+    class Field < Leaf
       attr_reader :key
 
       def initialize(key)

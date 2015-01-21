@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Expression < Node
+    class Expression < Leaf
       attr_reader :node
 
       def initialize(node)
