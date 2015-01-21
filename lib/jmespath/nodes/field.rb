@@ -4,6 +4,7 @@ module JMESPath
     class Field < Node
       def initialize(key)
         @key = key
+        @key_sym = key.respond_to?(:to_sym) ? key.to_sym : nil
       end
 
       def visit(value)
@@ -15,8 +16,8 @@ module JMESPath
         when Hash
           if value.key?(@key)
             value[@key]
-          elsif @key.is_a?(String)
-            value[@key.to_sym]
+          elsif @key_sym
+            value[@key_sym]
           end
         when Struct
           if value.respond_to?(@key)
@@ -43,6 +44,11 @@ module JMESPath
     class ChainedField < Field
       def initialize(keys)
         @keys = keys
+        @key_syms = keys.each_with_object({}) do |k, syms|
+          if k.respond_to?(:to_sym)
+            syms[k] = k.to_sym
+          end
+        end
       end
 
       def visit(value)
@@ -55,8 +61,8 @@ module JMESPath
           when Hash
             if value.key?(key)
               value[key]
-            elsif key.is_a?(String)
-              value[key.to_sym]
+            elsif (sym = @key_syms[key])
+              value[sym]
             end
           when Struct
             if value.respond_to?(key)
