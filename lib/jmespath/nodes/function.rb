@@ -34,7 +34,7 @@ module JMESPath
 
       def get_type(value)
         case
-        when Expression::ExprNode === value then 'expression'
+        when Expression === value then 'expression'
         when String === value then 'string'
         when hash_like?(value) then 'object'
         when Array === value then 'array'

@@ -61,7 +61,7 @@ module JMESPath
 
     def nud_expref(stream)
       stream.next
-      Nodes::Expression.new([expr(stream, 2)])
+      Nodes::Expression.new(expr(stream, 2))
     end
 
     def nud_filter(stream)
