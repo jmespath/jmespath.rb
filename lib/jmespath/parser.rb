@@ -164,7 +164,7 @@ module JMESPath
     def led_flatten(stream, left)
       stream.next
       children = [
-        Nodes::Flatten.new([left]),
+        Nodes::Flatten.new(left),
         parse_projection(stream, Token::BINDING_POWER[:flatten])
       ]
       Nodes::Projection.new(children, :array)

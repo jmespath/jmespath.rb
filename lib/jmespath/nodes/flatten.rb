@@ -1,9 +1,13 @@
 module JMESPath
   # @api private
   module Nodes
-    class Flatten < Node
+    class Flatten < Leaf
+      def initialize(child)
+        @child = child
+      end
+
       def visit(value)
-        value = @children[0].visit(value)
+        value = @child.visit(value)
         if Array === value
           value.each_with_object([]) do |v, values|
             if Array === v
@@ -20,7 +24,7 @@ module JMESPath
       def to_h
         {
           :type => :flatten,
-          :children => @children.map(&:to_h),
+          :children => [@child.to_h],
         }
       end
     end
