@@ -33,7 +33,9 @@ module JMESPath
       def call(args)
         nil
       end
+    end
 
+    module TypeChecker
       def get_type(value)
         case value
         when String then STRING_TYPE
@@ -63,27 +65,6 @@ module JMESPath
         OBJECT_TYPE => 'object',
         STRING_TYPE => 'string',
       }.freeze
-
-      def number_compare(mode, *args)
-        if args.count == 2
-          values = args[0]
-          expression = args[1]
-          if get_type(values) == ARRAY_TYPE && get_type(expression) == EXPRESSION_TYPE
-            values.send(mode) do |entry|
-              value = expression.eval(entry)
-              if get_type(value) == NUMBER_TYPE
-                value
-              else
-                raise Errors::InvalidTypeError, "function #{mode}() expects values to be an numbers"
-              end
-            end
-          else
-            raise Errors::InvalidTypeError, "function #{mode}() expects an array and an expression"
-          end
-        else
-          raise Errors::InvalidArityError, "function #{mode}() expects two arguments"
-        end
-      end
     end
 
     class AbsFunction < Function
@@ -241,6 +222,8 @@ module JMESPath
     end
 
     class TypeFunction < Function
+      include TypeChecker
+
       FUNCTIONS['type'] = self
 
       def call(args)
@@ -373,6 +356,8 @@ module JMESPath
     end
 
     class SortFunction < Function
+      include TypeChecker
+
       FUNCTIONS['sort'] = self
 
       def call(args)
@@ -398,6 +383,8 @@ module JMESPath
     end
 
     class SortByFunction < Function
+      include TypeChecker
+
       FUNCTIONS['sort_by'] = self
 
       def call(args)
@@ -425,7 +412,34 @@ module JMESPath
       end
     end
 
+    module NumberComparator
+      include TypeChecker
+
+      def number_compare(mode, *args)
+        if args.count == 2
+          values = args[0]
+          expression = args[1]
+          if get_type(values) == ARRAY_TYPE && get_type(expression) == EXPRESSION_TYPE
+            values.send(mode) do |entry|
+              value = expression.eval(entry)
+              if get_type(value) == NUMBER_TYPE
+                value
+              else
+                raise Errors::InvalidTypeError, "function #{mode}() expects values to be an numbers"
+              end
+            end
+          else
+            raise Errors::InvalidTypeError, "function #{mode}() expects an array and an expression"
+          end
+        else
+          raise Errors::InvalidArityError, "function #{mode}() expects two arguments"
+        end
+      end
+    end
+
     class MaxByFunction < Function
+      include NumberComparator
+
       FUNCTIONS['max_by'] = self
 
       def call(args)
@@ -434,6 +448,8 @@ module JMESPath
     end
 
     class MinByFunction < Function
+      include NumberComparator
+
       FUNCTIONS['min_by'] = self
 
       def call(args)
