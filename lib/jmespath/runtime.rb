@@ -37,24 +37,18 @@ module JMESPath
     #
     # @option options [Parser,CachingParser] :parser
     #
-    # @option options [Interpreter] :interpreter
-    #
     def initialize(options = {})
       @parser = options[:parser] || default_parser(options)
-      @interpreter = options[:interpreter] || TreeInterpreter.new
     end
 
     # @return [Parser, CachingParser]
     attr_reader :parser
 
-    # @return [Interpreter]
-    attr_reader :interpreter
-
     # @param [String<JMESPath>] expression
     # @param [Hash] data
     # @return [Mixed,nil]
     def search(expression, data)
-      @interpreter.visit(@parser.parse(expression), data)
+      @parser.parse(expression).visit(data)
     end
 
     private
