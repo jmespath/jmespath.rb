@@ -220,7 +220,7 @@ module JMESPath
       elsif pos > 2
         raise Errors::SyntaxError, 'invalid array slice syntax: too many colons'
       else
-        Nodes::Slice.new(parts)
+        Nodes::Slice.new(*parts)
       end
     end
 
