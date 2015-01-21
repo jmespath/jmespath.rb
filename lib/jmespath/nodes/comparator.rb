@@ -1,29 +1,30 @@
 module JMESPath
   # @api private
   module Nodes
-    class Comparator < Node
-      def initialize(children, relation)
-        super(children)
+    class Comparator < Leaf
+      def initialize(left, right, relation)
+        @left = left
+        @right = right
         @relation = relation
       end
 
       def visit(value)
-        left = @children[0].visit(value)
-        right = @children[1].visit(value)
+        left_value = @left.visit(value)
+        right_value = @right.visit(value)
         case @relation
-        when '==' then left == right
-        when '!=' then left != right
-        when '>' then left.is_a?(Integer) && right.is_a?(Integer) && left > right
-        when '>=' then left.is_a?(Integer) && right.is_a?(Integer) && left >= right
-        when '<' then left.is_a?(Integer) && right.is_a?(Integer) && left < right
-        when '<=' then left.is_a?(Integer) && right.is_a?(Integer) && left <= right
+        when '==' then left_value == right_value
+        when '!=' then left_value != right_value
+        when '>' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value > right_value
+        when '>=' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value >= right_value
+        when '<' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value < right_value
+        when '<=' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value <= right_value
         end
       end
 
       def to_h
         {
           :type => :comparator,
-          :children => @children.map(&:to_h),
+          :children => [@left.to_h, @right.to_h],
           :relation => @relation,
         }
       end
