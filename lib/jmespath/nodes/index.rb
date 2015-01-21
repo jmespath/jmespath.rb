@@ -1,8 +1,6 @@
 module JMESPath
   # @api private
   module Nodes
-      attr_reader :index
-
     class Index < Leaf
       def initialize(index)
         @index = index

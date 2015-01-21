@@ -2,8 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class Function < Node
-      attr_reader :fn
-
       def initialize(children, fn)
         super(children)
         @fn = fn
