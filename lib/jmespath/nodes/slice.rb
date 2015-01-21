@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Slice < Leaf
+    class Slice < Node
       def initialize(args)
         @args = args
       end

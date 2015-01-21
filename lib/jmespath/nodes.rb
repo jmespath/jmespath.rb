@@ -2,19 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class Node
-      def initialize(children)
-        @children = children
-      end
-
-      def visit(value)
-      end
-
-      def hash_like?(value)
-        Hash === value || Struct === value
-      end
-    end
-
-    class Leaf
       def visit(value)
       end
 

@@ -3,7 +3,7 @@ module JMESPath
   module Nodes
     class Function < Node
       def initialize(children, fn)
-        super(children)
+        @children = children
         @fn = fn
       end
 

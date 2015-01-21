@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Condition < Leaf
+    class Condition < Node
       def initialize(test, child)
         @test = test
         @child = child

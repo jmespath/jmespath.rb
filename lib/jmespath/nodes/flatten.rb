@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Flatten < Leaf
+    class Flatten < Node
       def initialize(child)
         @child = child
       end

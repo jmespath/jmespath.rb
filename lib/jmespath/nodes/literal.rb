@@ -1,7 +1,7 @@
 module JMESPath
   # @api private
   module Nodes
-    class Literal < Leaf
+    class Literal < Node
       def initialize(value)
         @value = value
       end
