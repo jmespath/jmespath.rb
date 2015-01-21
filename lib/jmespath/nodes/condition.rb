@@ -9,9 +9,11 @@ module JMESPath
       end
 
       def visit(value)
-        true == @children[0].visit(value) ?
-          @children[1].visit(value) :
+        if @children[0].visit(value)
+          @children[1].visit(value)
+        else
           nil
+        end
       end
 
       def to_h
