@@ -13,13 +13,6 @@ module JMESPath
           @children.map { |n| n.visit(value) }
         end
       end
-
-      def to_h
-        {
-          :type => :multi_select_list,
-          :children => @children.map(&:to_h),
-        }
-      end
     end
   end
 end

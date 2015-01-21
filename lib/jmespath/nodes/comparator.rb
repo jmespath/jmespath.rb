@@ -25,14 +25,6 @@ module JMESPath
         check(@left.visit(value), @right.visit(value))
       end
 
-      def to_h
-        {
-          :type => :comparator,
-          :children => [@left.to_h, @right.to_h],
-          :relation => @relation,
-        }
-      end
-
       private
 
       def check(left_value, right_value)

@@ -5,12 +5,6 @@ module JMESPath
       def visit(value)
         value
       end
-
-      def to_h
-        {
-          :type => :current,
-        }
-      end
     end
   end
 end

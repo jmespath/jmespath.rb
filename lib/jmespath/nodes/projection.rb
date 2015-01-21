@@ -22,14 +22,6 @@ module JMESPath
         end
       end
 
-      def to_h
-        {
-          :type => :projection,
-          :children => [@left.to_h, @right.to_h],
-          :from => @from,
-        }
-      end
-
       private
 
       def extract_projectees(left_value)

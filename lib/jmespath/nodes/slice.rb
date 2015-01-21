@@ -29,13 +29,6 @@ module JMESPath
         end
       end
 
-      def to_h
-        {
-          :type => :slice,
-          :args => @args,
-        }
-      end
-
       private
 
       def adjust_slice(length, start, stop, step)

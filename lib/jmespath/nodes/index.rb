@@ -13,13 +13,6 @@ module JMESPath
           nil
         end
       end
-
-      def to_h
-        {
-          :type => :index,
-          :index => @index,
-        }
-      end
     end
   end
 end

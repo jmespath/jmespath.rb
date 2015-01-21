@@ -11,13 +11,6 @@ module JMESPath
       def visit(value)
         self
       end
-
-      def to_h
-        {
-          :type => :expression,
-          :children => @children.map(&:to_h),
-        }
-      end
     end
   end
 end
