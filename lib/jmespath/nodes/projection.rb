@@ -19,10 +19,26 @@ module JMESPath
         end
       end
 
+      def optimize
+        if @projection.is_a?(Current)
+          fast_instance
+        else
+          self
+        end
+      end
+
       private
 
       def extract_targets(left_value)
         nil
+      end
+    end
+
+    module FastProjector
+      def visit(value)
+        if (targets = extract_targets(@target.visit(value)))
+          targets.compact
+        end
       end
     end
 
@@ -34,6 +50,14 @@ module JMESPath
           nil
         end
       end
+
+      def fast_instance
+        FastArrayProjection.new(@target, @projection)
+      end
+    end
+
+    class FastArrayProjection < ArrayProjection
+      include FastProjector
     end
 
     class ObjectProjection < Projection
@@ -48,6 +72,14 @@ module JMESPath
           nil
         end
       end
+
+      def fast_instance
+        FastObjectProjection.new(@target, @projection)
+      end
+    end
+
+    class FastObjectProjection < ObjectProjection
+      include FastProjector
     end
   end
 end
