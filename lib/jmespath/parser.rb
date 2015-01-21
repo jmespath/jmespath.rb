@@ -141,8 +141,8 @@ module JMESPath
       if stream.token.type == :star
         parse_wildcard_object(stream, left)
       else
-        children = [left, parse_dot(stream, Token::BINDING_POWER[:dot])]
-        Nodes::Subexpression.new(children)
+        right = parse_dot(stream, Token::BINDING_POWER[:dot])
+        Nodes::Subexpression.new(left, right)
       end
     end
 
@@ -170,11 +170,8 @@ module JMESPath
       stream.next(match: Set.new([:number, :colon, :star]))
       type = stream.token.type
       if type == :number || type == :colon
-        children = [
-          left,
-          parse_array_index_expression(stream)
-        ]
-        Nodes::Subexpression.new(children)
+        right = parse_array_index_expression(stream)
+        Nodes::Subexpression.new(left, right)
       else
         parse_wildcard_array(stream, left)
       end
