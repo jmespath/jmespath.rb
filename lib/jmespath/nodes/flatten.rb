@@ -11,8 +11,12 @@ module JMESPath
       def visit(value)
         value = @children[0].visit(value)
         if Array === value
-          value.inject([]) do |values, v|
-            values + (Array === v ? v : [v])
+          value.each_with_object([]) do |v, values|
+            if Array === v
+              values.concat(v)
+            else
+              values.push(v)
+            end
           end
         else
           nil
