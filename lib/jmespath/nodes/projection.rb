@@ -15,13 +15,18 @@ module JMESPath
         # the non-null results into the return value.
         left = @children[0].visit(value)
         if @from == :object && hash_like?(left)
-          projection(left.values)
-        elsif @from == :object && left == []
-          projection(left)
-        elsif @from == :array && Array === left
-          projection(left)
-        else
-          nil
+          left = left.values
+        elsif !(@from == :object && left == EMPTY_ARRAY) && !(@from == :array && Array === left)
+          left = nil
+        end
+        if left
+          list = []
+          left.each do |v|
+            if (vv = @children[1].visit(v))
+              list << vv
+            end
+          end
+          list
         end
       end
 
@@ -33,13 +38,7 @@ module JMESPath
         }
       end
 
-      private
-
-      def projection(values)
-        values.inject([]) do |list, v|
-          list << @children[1].visit(v)
-        end.compact
-      end
+      EMPTY_ARRAY = [].freeze
     end
   end
 end
