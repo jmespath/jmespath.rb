@@ -2,23 +2,27 @@ module JMESPath
   # @api private
   module Nodes
     class Comparator < Node
-      def initialize(left, right, relation)
+      def initialize(left, right)
         @left = left
         @right = right
-        @relation = relation
+      end
+
+      def self.create(relation, left, right)
+        type = begin
+          case relation
+          when '==' then EqComparator
+          when '!=' then NeqComparator
+          when '>' then GtComparator
+          when '>=' then GteComparator
+          when '<' then LtComparator
+          when '<=' then LteComparator
+          end
+        end
+        type.new(left, right)
       end
 
       def visit(value)
-        left_value = @left.visit(value)
-        right_value = @right.visit(value)
-        case @relation
-        when '==' then left_value == right_value
-        when '!=' then left_value != right_value
-        when '>' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value > right_value
-        when '>=' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value >= right_value
-        when '<' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value < right_value
-        when '<=' then left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value <= right_value
-        end
+        check(@left.visit(value), @right.visit(value))
       end
 
       def to_h
@@ -27,6 +31,48 @@ module JMESPath
           :children => [@left.to_h, @right.to_h],
           :relation => @relation,
         }
+      end
+
+      private
+
+      def check(left_value, right_value)
+        nil
+      end
+    end
+
+    class EqComparator < Comparator
+      def check(left_value, right_value)
+        left_value == right_value
+      end
+    end
+
+    class NeqComparator < Comparator
+      def check(left_value, right_value)
+        left_value != right_value
+      end
+    end
+
+    class GtComparator < Comparator
+      def check(left_value, right_value)
+        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value > right_value
+      end
+    end
+
+    class GteComparator < Comparator
+      def check(left_value, right_value)
+        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value >= right_value
+      end
+    end
+
+    class LtComparator < Comparator
+      def check(left_value, right_value)
+        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value < right_value
+      end
+    end
+
+    class LteComparator < Comparator
+      def check(left_value, right_value)
+        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value <= right_value
       end
     end
   end

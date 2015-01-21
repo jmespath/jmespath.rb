@@ -133,7 +133,7 @@ module JMESPath
       token = stream.token
       stream.next
       right = expr(stream)
-      Nodes::Comparator.new(left, right, token.value)
+      Nodes::Comparator.create(token.value, left, right)
     end
 
     def led_dot(stream, left)
