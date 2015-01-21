@@ -46,7 +46,7 @@ module JMESPath
       end
 
       def optimize
-        children = @children.dup
+        children = @children.map(&:optimize)
         index = 0
         while index < children.size - 1
           if children[index].is_a?(Field) && children[index + 1].is_a?(Field)
