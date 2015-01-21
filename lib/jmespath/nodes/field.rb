@@ -8,21 +8,16 @@ module JMESPath
       end
 
       def visit(value)
-        case value
-        when Array
-          if @key.is_a?(Integer)
-            value[@key]
+        if value.is_a?(Array) && @key.is_a?(Integer)
+          value[@key]
+        elsif value.is_a?(Hash)
+          if !(v = value[@key]).nil?
+            v
+          elsif @key_sym && !(v = value[@key_sym]).nil?
+            v
           end
-        when Hash
-          if value.key?(@key)
-            value[@key]
-          elsif @key_sym
-            value[@key_sym]
-          end
-        when Struct
-          if value.respond_to?(@key)
-            value[@key]
-          end
+        elsif value.is_a?(Struct) && value.respond_to?(@key)
+          value[@key]
         end
       end
 
@@ -53,21 +48,16 @@ module JMESPath
 
       def visit(value)
         @keys.reduce(value) do |value, key|
-          case value
-          when Array
-            if key.is_a?(Integer)
-              value[key]
+          if value.is_a?(Array) && key.is_a?(Integer)
+            value[key]
+          elsif value.is_a?(Hash)
+            if !(v = value[key]).nil?
+              v
+            elsif (sym = @key_syms[key]) && !(v = value[sym]).nil?
+              v
             end
-          when Hash
-            if value.key?(key)
-              value[key]
-            elsif (sym = @key_syms[key])
-              value[sym]
-            end
-          when Struct
-            if value.respond_to?(key)
-              value[key]
-            end
+          elsif value.is_a?(Struct) && value.respond_to?(key)
+            value[key]
           end
         end
       end
