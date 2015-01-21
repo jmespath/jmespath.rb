@@ -2,12 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class Flatten < Node
-      attr_reader :children
-
-      def initialize(children)
-        @children = children
-      end
-
       def visit(value)
         value = @children[0].visit(value)
         if Array === value

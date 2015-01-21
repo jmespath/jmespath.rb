@@ -2,10 +2,10 @@ module JMESPath
   # @api private
   module Nodes
     class Projection < Node
-      attr_reader :children, :from
+      attr_reader :from
 
       def initialize(children, from)
-        @children = children
+        super(children)
         @from = from
       end
 

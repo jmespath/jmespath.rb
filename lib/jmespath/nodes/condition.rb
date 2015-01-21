@@ -2,12 +2,6 @@ module JMESPath
   # @api private
   module Nodes
     class Condition < Node
-      attr_reader :children
-
-      def initialize(children)
-        @children = children
-      end
-
       def visit(value)
         if @children[0].visit(value)
           @children[1].visit(value)

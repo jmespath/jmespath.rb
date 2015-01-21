@@ -1,9 +1,9 @@
 module JMESPath
   # @api private
   module Nodes
-    class Current < Node
       attr_reader :value
 
+    class Current < Leaf
       def visit(value)
         value
       end
