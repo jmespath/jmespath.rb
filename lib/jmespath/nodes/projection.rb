@@ -1,9 +1,10 @@
 module JMESPath
   # @api private
   module Nodes
-    class Projection < Node
-      def initialize(children, from)
-        super(children)
+    class Projection < Leaf
+      def initialize(left, right, from)
+        @left = left
+        @right = right
         @from = from
       end
 
@@ -11,16 +12,16 @@ module JMESPath
         # Interprets a projection node, passing the values of the left
         # child through the values of the right child and aggregating
         # the non-null results into the return value.
-        left = @children[0].visit(value)
-        if @from == :object && hash_like?(left)
-          left = left.values
-        elsif !(@from == :object && left == EMPTY_ARRAY) && !(@from == :array && Array === left)
-          left = nil
+        left_value = @left.visit(value)
+        if @from == :object && hash_like?(left_value)
+          left_value = left_value.values
+        elsif !(@from == :object && left_value == EMPTY_ARRAY) && !(@from == :array && Array === left_value)
+          left_value = nil
         end
-        if left
+        if left_value
           list = []
-          left.each do |v|
-            if (vv = @children[1].visit(v))
+          left_value.each do |v|
+            if (vv = @right.visit(v))
               list << vv
             end
           end
@@ -31,7 +32,7 @@ module JMESPath
       def to_h
         {
           :type => :projection,
-          :children => @children.map(&:to_h),
+          :children => [@left.to_h, @right.to_h],
           :from => @from,
         }
       end
