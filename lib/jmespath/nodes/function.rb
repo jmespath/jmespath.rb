@@ -36,24 +36,42 @@ module JMESPath
 
       def get_type(value)
         case value
-        when String then 'string'
-        when true, false then 'boolean'
-        when nil then 'null'
-        when Numeric then 'number'
-        when Hash, Struct then 'object'
-        when Array then 'array'
-        when Expression then 'expression'
+        when String then STRING_TYPE
+        when true, false then BOOLEAN_TYPE
+        when nil then NULL_TYPE
+        when Numeric then NUMBER_TYPE
+        when Hash, Struct then OBJECT_TYPE
+        when Array then ARRAY_TYPE
+        when Expression then EXPRESSION_TYPE
         end
       end
 
+      ARRAY_TYPE = 0
+      BOOLEAN_TYPE = 1
+      EXPRESSION_TYPE = 2
+      NULL_TYPE = 3
+      NUMBER_TYPE = 4
+      OBJECT_TYPE = 5
+      STRING_TYPE = 6
+
+      TYPE_NAMES = {
+        ARRAY_TYPE => 'array',
+        BOOLEAN_TYPE => 'boolean',
+        EXPRESSION_TYPE => 'expression',
+        NULL_TYPE => 'null',
+        NUMBER_TYPE => 'number',
+        OBJECT_TYPE => 'object',
+        STRING_TYPE => 'string',
+      }.freeze
+
       def number_compare(mode, *args)
         if args.count == 2
-          if get_type(args[0]) == 'array' && get_type(args[1]) == 'expression'
+          if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
             values = args[0]
             expression = args[1]
             args[0].send("#{mode}_by") do |entry|
               value = expression.eval(entry)
-              if get_type(value) == 'number'
+              if get_type(value) == NUMBER_TYPE
                 value
               else
                 raise Errors::InvalidTypeError, "function #{mode}_by() expects values to be an numbers"
@@ -225,7 +243,7 @@ module JMESPath
 
       def call(args)
         if args.count == 1
-          get_type(args.first)
+          TYPE_NAMES[get_type(args.first)]
         else
           raise Errors::InvalidArityError, "function type() expects one argument"
         end
@@ -362,7 +380,7 @@ module JMESPath
             value.sort do |a, b|
               a_type = get_type(a)
               b_type = get_type(b)
-              if ['string', 'number'].include?(a_type) && a_type == b_type
+              if (a_type == STRING_TYPE || a_type == NUMBER_TYPE) && a_type == b_type
                 a <=> b
               else
                 raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
@@ -382,7 +400,7 @@ module JMESPath
 
       def call(args)
         if args.count == 2
-          if get_type(args[0]) == 'array' && get_type(args[1]) == 'expression'
+          if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
             values = args[0]
             expression = args[1]
             values.sort do |a,b|
@@ -390,7 +408,7 @@ module JMESPath
               b_value = expression.eval(b)
               a_type = get_type(a_value)
               b_type = get_type(b_value)
-              if ['string', 'number'].include?(a_type) && a_type == b_type
+              if (a_type == STRING_TYPE || a_type == NUMBER_TYPE) && a_type == b_type
                 a_value <=> b_value
               else
                 raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
