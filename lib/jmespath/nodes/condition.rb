@@ -45,6 +45,25 @@ module JMESPath
       def visit(value)
         @left.visit(value) == @right.visit(value) ? @child.visit(value) : nil
       end
+
+      def optimize
+        if @right.is_a?(Literal)
+          LiteralRightEqCondition.new(@left, @right, @child)
+        else
+          self
+        end
+      end
+    end
+
+    class LiteralRightEqCondition < EqCondition
+      def initialize(left, right, child)
+        super
+        @right = @right.value
+      end
+
+      def visit(value)
+        @left.visit(value) == @right ? @child.visit(value) : nil
+      end
     end
 
     class NeqCondition < ComparatorCondition
@@ -52,6 +71,25 @@ module JMESPath
 
       def visit(value)
         @left.visit(value) != @right.visit(value) ? @child.visit(value) : nil
+      end
+
+      def optimize
+        if @right.is_a?(Literal)
+          LiteralRightNeqCondition.new(@left, @right, @child)
+        else
+          self
+        end
+      end
+    end
+
+    class LiteralRightNeqCondition < NeqCondition
+      def initialize(left, right, child)
+        super
+        @right = @right.value
+      end
+
+      def visit(value)
+        @left.visit(value) != @right ? @child.visit(value) : nil
       end
     end
 
