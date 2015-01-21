@@ -12,18 +12,52 @@ module JMESPath
       end
 
       def optimize
-        left = @left.optimize
-        right = @right.optimize
-        if left.is_a?(Field) && right.is_a?(Field)
-          left.chain(right)
-        else
-          self
-        end
+        Chain.new(flatten).optimize
       end
 
       protected
 
       attr_reader :left, :right
+
+      def flatten
+        nodes = [@left, @right]
+        until nodes.none? { |node| node.is_a?(Subexpression) }
+          nodes = nodes.flat_map do |node|
+            if node.is_a?(Subexpression)
+              [node.left, node.right]
+            else
+              [node]
+            end
+          end
+        end
+        nodes.map(&:optimize)
+      end
+    end
+
+    class Chain
+      def initialize(children)
+        @children = children
+      end
+
+      def visit(value)
+        @children.reduce(value) do |v, child|
+          child.visit(v)
+        end
+      end
+
+      def optimize
+        children = @children.dup
+        index = 0
+        while index < children.size - 1
+          if children[index].is_a?(Field) && children[index + 1].is_a?(Field)
+            children[index] = children[index].chain(children[index + 1])
+            children.delete_at(index + 1)
+          else
+            index += 1
+          end
+        end
+        Chain.new(children)
+      end
     end
   end
 end
