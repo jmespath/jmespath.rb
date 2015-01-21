@@ -20,6 +20,10 @@ module JMESPath
           nil
         end
       end
+
+      def optimize
+        self.class.new(@child.optimize)
+      end
     end
   end
 end

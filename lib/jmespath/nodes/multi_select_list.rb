@@ -13,6 +13,10 @@ module JMESPath
           @children.map { |n| n.visit(value) }
         end
       end
+
+      def optimize
+        self.class.new(@children.map(&:optimize))
+      end
     end
   end
 end

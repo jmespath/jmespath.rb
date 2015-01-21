@@ -15,6 +15,10 @@ module JMESPath
           result
         end
       end
+
+      def optimize
+        self.class.new(@left.optimize, @right.optimize)
+      end
     end
   end
 end

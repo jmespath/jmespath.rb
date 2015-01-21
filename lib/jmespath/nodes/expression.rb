@@ -15,6 +15,10 @@ module JMESPath
       def eval(value)
         @expression.visit(value)
       end
+
+      def optimize
+        self.class.new(@expression.optimize)
+      end
     end
   end
 end
