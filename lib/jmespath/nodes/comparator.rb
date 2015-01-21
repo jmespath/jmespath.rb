@@ -2,6 +2,8 @@ module JMESPath
   # @api private
   module Nodes
     class Comparator < Node
+      attr_reader :left, :right
+
       def initialize(left, right)
         @left = left
         @right = right
