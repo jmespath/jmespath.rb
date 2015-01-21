@@ -25,6 +25,10 @@ module JMESPath
         check(@left.visit(value), @right.visit(value))
       end
 
+      def optimize
+        self.class.new(@left.optimize, @right.optimize)
+      end
+
       private
 
       def check(left_value, right_value)

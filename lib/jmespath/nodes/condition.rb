@@ -14,6 +14,10 @@ module JMESPath
           nil
         end
       end
+
+      def optimize
+        self.class.new(@test.optimize, @child.optimize)
+      end
     end
   end
 end

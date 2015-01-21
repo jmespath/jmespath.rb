@@ -24,7 +24,7 @@ module JMESPath
         if @projection.is_a?(Current)
           fast_instance
         else
-          self
+          self.class.new(@target.optimize, @projection.optimize)
         end
       end
 
@@ -53,7 +53,7 @@ module JMESPath
       end
 
       def fast_instance
-        FastArrayProjection.new(@target, @projection)
+        FastArrayProjection.new(@target.optimize, @projection)
       end
     end
 
@@ -75,7 +75,7 @@ module JMESPath
       end
 
       def fast_instance
-        FastObjectProjection.new(@target, @projection)
+        FastObjectProjection.new(@target.optimize, @projection)
       end
     end
 

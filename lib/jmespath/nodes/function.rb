@@ -20,6 +20,10 @@ module JMESPath
         call(@children.map { |child| child.visit(value) })
       end
 
+      def optimize
+        self.class.new(@children.map(&:optimize))
+      end
+
       class FunctionName
         attr_reader :name
 
