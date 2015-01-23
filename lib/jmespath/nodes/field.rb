@@ -8,9 +8,7 @@ module JMESPath
       end
 
       def visit(value)
-        if value.is_a?(Array) && @key.is_a?(Integer)
-          value[@key]
-        elsif value.is_a?(Hash)
+        if value.is_a?(Hash)
           if !(v = value[@key]).nil?
             v
           elsif @key_sym && !(v = value[@key_sym]).nil?
