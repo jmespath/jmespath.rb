@@ -4,6 +4,7 @@ module JMESPath
     class Field < Node
       def initialize(key)
         @key = key
+        @keys = [key]
         @key_sym = key.respond_to?(:to_sym) ? key.to_sym : nil
       end
 
@@ -24,14 +25,12 @@ module JMESPath
       end
 
       def chain(other)
-        ChainedField.new([@key, *other.keys])
+        ChainedField.new([*keys, *other.keys])
       end
 
       protected
 
-      def keys
-        [@key]
-      end
+      attr_reader :keys
     end
 
     class ChainedField < Field
@@ -59,14 +58,6 @@ module JMESPath
           end
         end
       end
-
-      def chain(other)
-        ChainedField.new([*@keys, *other.keys])
-      end
-
-      private
-
-      attr_reader :keys
     end
   end
 end
