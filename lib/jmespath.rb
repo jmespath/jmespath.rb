@@ -8,6 +8,7 @@ module JMESPath
   autoload :ExprNode, 'jmespath/expr_node'
   autoload :Lexer, 'jmespath/lexer'
   autoload :Nodes, 'jmespath/nodes'
+  autoload :OptimizingParser, 'jmespath/optimizing_parser'
   autoload :Parser, 'jmespath/parser'
   autoload :Runtime, 'jmespath/runtime'
   autoload :Token, 'jmespath/token'
