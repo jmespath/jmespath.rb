@@ -43,7 +43,7 @@ JMESPath.search('foo.bar', { abc: "mno" })
 #=> nil
 ```
 
-**[See the JMESPath specification for a full list of supported search expressions.](http://jmespath.readthedocs.org/en/latest/specification.html#examples)**
+**[See the JMESPath specification for a full list of supported search expressions.](http://jmespath.org/specification.html)**
 
 ## Indifferent Access
 
@@ -76,8 +76,8 @@ end
 
 * [Release Notes](https://github.com/trevorrowe/jmespath.rb/releases)
 * [License](http://www.apache.org/licenses/LICENSE-2.0)
-* [JMESPath Examples](http://jmespath.readthedocs.org/en/latest/specification.html#examples)
-* [JMESPath Specification](http://jmespath.readthedocs.org/en/latest/specification.html)
+* [JMESPath Tutorial](http://jmespath.org/tutorial.html)
+* [JMESPath Specification](http://jmespath.org/specification.html)
 
 ## License
 
