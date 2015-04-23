@@ -4,9 +4,9 @@ root = File.dirname(File.dirname(__FILE__))
 $:.unshift(File.join(root, 'lib'))
 
 require 'jmespath'
-require 'multi_json'
+require 'json'
 
 expression = ARGV[0]
-json = MultiJson.load(STDIN.read)
+json = JSON.load(STDIN.read)
 
-$stdout.puts(MultiJson.dump(JMESPath.search(expression, json)))
+$stdout.puts(JSON.dump(JMESPath.search(expression, json)))

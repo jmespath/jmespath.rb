@@ -1,3 +1,5 @@
+require 'json'
+
 module JMESPath
   # @api private
   class Lexer
@@ -73,7 +75,7 @@ module JMESPath
       end
       tokens << Token.new(:eof, nil, offset)
       unless expression.size == offset
-        syntax_error('invalid expression', expression, offset) 
+        syntax_error('invalid expression', expression, offset)
       end
       tokens
     end
@@ -102,8 +104,8 @@ module JMESPath
     end
 
     def decode_json(json, expression, offset)
-      MultiJson.load(json)
-    rescue MultiJson::ParseError => e
+      JSON.load(json)
+    rescue JSON::ParserError => e
       syntax_error(e.message, expression, offset)
     end
 

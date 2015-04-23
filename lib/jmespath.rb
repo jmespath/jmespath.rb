@@ -1,4 +1,4 @@
-require 'multi_json'
+require 'json'
 require 'pathname'
 
 module JMESPath
@@ -26,7 +26,7 @@ module JMESPath
       data = case data
         when Hash, Struct then data # check for most common case first
         when Pathname then load_json(data)
-        when IO, StringIO then MultiJson.load(data.read)
+        when IO, StringIO then JSON.load(data.read)
         else data
         end
       Runtime.new.search(expression, data)
@@ -34,7 +34,7 @@ module JMESPath
 
     # @api private
     def load_json(path)
-      MultiJson.load(File.open(path, 'r', encoding: 'UTF-8') { |f| f.read })
+      JSON.load(File.open(path, 'r', encoding: 'UTF-8') { |f| f.read })
     end
 
   end
