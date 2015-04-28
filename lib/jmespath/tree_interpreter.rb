@@ -1,3 +1,5 @@
+require 'json'
+
 module JMESPath
   # @api private
   class TreeInterpreter
@@ -319,7 +321,7 @@ module JMESPath
     def function_to_string(*args)
       if args.count == 1
         value = args.first
-        String === value ? value : MultiJson.dump(value)
+        String === value ? value : JSON.dump(value)
       else
         raise Errors::InvalidArityError, "function to_string() expects one argument"
       end

@@ -6,8 +6,6 @@ An implementation of [JMESPath](https://github.com/boto/jmespath) for Ruby. This
 
 ## Installation
 
-The jmespath gem is written in pure Ruby and has a single dependency on `multi_json`.
-
 ```
 $ gem install jmespath
 ```
