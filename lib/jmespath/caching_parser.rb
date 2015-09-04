@@ -3,8 +3,8 @@ require 'thread'
 module JMESPath
   class CachingParser
 
-    def initialize(options = {})
-      @parser = options[:parser] || Parser.new(options)
+    def initialize(parser)
+      @parser = parser
       @mutex = Mutex.new
       @cache = {}
     end
