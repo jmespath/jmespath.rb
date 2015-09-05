@@ -15,7 +15,7 @@ module JMESPath
         :filter,            # foo.[?bar==10]
     ])
 
-    CURRENT_NODE = { type: :current }
+    CURRENT_NODE = Nodes::Current.new
 
     # @option options [Lexer] :lexer
     def initialize(options = {})
@@ -61,10 +61,7 @@ module JMESPath
 
     def nud_expref(stream)
       stream.next
-      {
-        type: :expression,
-        children: [expr(stream, 2)]
-      }
+      Nodes::Expression.new(expr(stream, 2))
     end
 
     def nud_filter(stream)
@@ -77,8 +74,12 @@ module JMESPath
 
     def nud_identifier(stream)
       token = stream.token
-      stream.next
-      { type: :field, key: token.value }
+      n = stream.next
+      if n.type == :lparen
+        Nodes::Function::FunctionName.new(token.value)
+      else
+        Nodes::Field.new(token.value)
+      end
     end
 
     def nud_lbrace(stream)
@@ -92,10 +93,7 @@ module JMESPath
         end
       end while stream.token.type != :rbrace
       stream.next
-      {
-        type: :multi_select_hash,
-        children: pairs
-      }
+      Nodes::MultiSelectHash.new(pairs)
     end
 
     def nud_lbracket(stream)
@@ -113,10 +111,7 @@ module JMESPath
     def nud_literal(stream)
       value = stream.token.value
       stream.next
-      {
-        type: :literal,
-        value: value
-      }
+      Nodes::Literal.new(value)
     end
 
     def nud_quoted_identifier(stream)
@@ -126,7 +121,7 @@ module JMESPath
         msg = 'quoted identifiers are not allowed for function names'
         raise Errors::SyntaxError, msg
       else
-        { type: :field, key: token[:value] }
+        Nodes::Field.new(token[:value])
       end
     end
 
@@ -137,14 +132,8 @@ module JMESPath
     def led_comparator(stream, left)
       token = stream.token
       stream.next
-      {
-        type: :comparator,
-        relation: token.value,
-        children: [
-          left,
-          expr(stream),
-        ]
-      }
+      right = expr(stream)
+      Nodes::Comparator.create(token.value, left, right)
     end
 
     def led_dot(stream, left)
@@ -152,13 +141,8 @@ module JMESPath
       if stream.token.type == :star
         parse_wildcard_object(stream, left)
       else
-        {
-          type: :subexpression,
-          children: [
-            left,
-            parse_dot(stream, Token::BINDING_POWER[:dot])
-          ]
-        }
+        right = parse_dot(stream, Token::BINDING_POWER[:dot])
+        Nodes::Subexpression.new(left, right)
       end
     end
 
@@ -170,42 +154,24 @@ module JMESPath
       end
       stream.next
       rhs = parse_projection(stream, Token::BINDING_POWER[:filter])
-      {
-        type: :projection,
-        from: :array,
-        children: [
-          left ? left : CURRENT_NODE,
-          {
-            type: :condition,
-            children: [expression, rhs],
-          }
-        ]
-      }
+      left ||= CURRENT_NODE
+      right = Nodes::Condition.new(expression, rhs)
+      Nodes::ArrayProjection.new(left, right)
     end
 
     def led_flatten(stream, left)
       stream.next
-      {
-        type: :projection,
-        from: :array,
-        children: [
-          { type: :flatten, children: [left] },
-          parse_projection(stream, Token::BINDING_POWER[:flatten])
-        ]
-      }
+      left = Nodes::Flatten.new(left)
+      right = parse_projection(stream, Token::BINDING_POWER[:flatten])
+      Nodes::ArrayProjection.new(left, right)
     end
 
     def led_lbracket(stream, left)
       stream.next(match: Set.new([:number, :colon, :star]))
       type = stream.token.type
       if type == :number || type == :colon
-        {
-          type: :subexpression,
-          children: [
-            left,
-            parse_array_index_expression(stream)
-          ]
-        }
+        right = parse_array_index_expression(stream)
+        Nodes::Subexpression.new(left, right)
       else
         parse_wildcard_array(stream, left)
       end
@@ -213,7 +179,7 @@ module JMESPath
 
     def led_lparen(stream, left)
       args = []
-      name = left[:key]
+      name = left.name
       stream.next
       while stream.token.type != :rparen
         args << expr(stream, 0)
@@ -222,27 +188,19 @@ module JMESPath
         end
       end
       stream.next
-      {
-        type: :function,
-        fn: name,
-        children: args,
-      }
+      Nodes::Function.create(name, args)
     end
 
     def led_or(stream, left)
       stream.next
-      {
-        type: :or,
-        children: [left, expr(stream, Token::BINDING_POWER[:or])]
-      }
+      right = expr(stream, Token::BINDING_POWER[:or])
+      Nodes::Or.new(left, right)
     end
 
     def led_pipe(stream, left)
       stream.next
-      {
-        type: :pipe,
-        children: [left, expr(stream, Token::BINDING_POWER[:pipe])],
-      }
+      right = expr(stream, Token::BINDING_POWER[:pipe])
+      Nodes::Pipe.new(left, right)
     end
 
     def parse_array_index_expression(stream)
@@ -258,11 +216,11 @@ module JMESPath
       end while stream.token.type != :rbracket
       stream.next
       if pos == 0
-        { type: :index, index: parts[0] }
+        Nodes::Index.new(parts[0])
       elsif pos > 2
         raise Errors::SyntaxError, 'invalid array slice syntax: too many colons'
       else
-        { type: :slice, args: parts }
+        Nodes::Slice.new(*parts)
       end
     end
 
@@ -279,11 +237,7 @@ module JMESPath
       key = stream.token.value
       stream.next(match:Set.new([:colon]))
       stream.next
-      {
-        type: :key_value_pair,
-        key: key,
-        children: [expr(stream)]
-      }
+      Nodes::MultiSelectHash::KeyValuePair.new(key, expr(stream))
     end
 
     def parse_multi_select_list(stream)
@@ -298,10 +252,7 @@ module JMESPath
         end
       end while stream.token.type != :rbracket
       stream.next
-      {
-        type: :multi_select_list,
-        children: nodes
-      }
+      Nodes::MultiSelectList.new(nodes)
     end
 
     def parse_projection(stream, binding_power)
@@ -321,26 +272,16 @@ module JMESPath
     def parse_wildcard_array(stream, left = nil)
       stream.next(match:Set.new([:rbracket]))
       stream.next
-      {
-        type: :projection,
-        from: :array,
-        children: [
-          left ? left : CURRENT_NODE,
-          parse_projection(stream, Token::BINDING_POWER[:star])
-        ]
-      }
+      left ||= CURRENT_NODE
+      right = parse_projection(stream, Token::BINDING_POWER[:star])
+      Nodes::ArrayProjection.new(left, right)
     end
 
     def parse_wildcard_object(stream, left = nil)
       stream.next
-      {
-        type: :projection,
-        from: :object,
-        children: [
-          left ? left : CURRENT_NODE,
-          parse_projection(stream, Token::BINDING_POWER[:star])
-        ]
-      }
+      left ||= CURRENT_NODE
+      right = parse_projection(stream, Token::BINDING_POWER[:star])
+      Nodes::ObjectProjection.new(left, right)
     end
 
   end
