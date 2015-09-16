@@ -1,4 +1,4 @@
-Unreleased Changes
+1.1.1 (2015-09-16)
 ------------------
 
 * Fix for Ruby version 1.9.3 which does not support `#[]`
