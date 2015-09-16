@@ -5,13 +5,15 @@ module JMESPath
 
       FUNCTIONS = {}
 
-      def initialize(children)
+      def initialize(children, options = {})
         @children = children
+        @options = options
+        @disable_visit_errors = @options[:disable_visit_errors]
       end
 
-      def self.create(name, children)
+      def self.create(name, children, options = {})
         if (type = FUNCTIONS[name])
-          type.new(children)
+          type.new(children, options)
         else
           raise Errors::UnknownFunctionError, "unknown function #{name}()"
         end
@@ -22,7 +24,7 @@ module JMESPath
       end
 
       def optimize
-        self.class.new(@children.map(&:optimize))
+        self.class.new(@children.map(&:optimize), @options)
       end
 
       class FunctionName
@@ -34,6 +36,12 @@ module JMESPath
       end
 
       private
+
+      def maybe_raise(error_type, message)
+        unless @disable_visit_errors
+          raise error_type, message
+        end
+      end
 
       def call(args)
         nil
@@ -79,12 +87,12 @@ module JMESPath
         if args.count == 1
           value = args.first
         else
-          raise Errors::InvalidArityError, "function abs() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function abs() expects one argument"
         end
         if Numeric === value
           value.abs
         else
-          raise Errors::InvalidTypeError, "function abs() expects a number"
+          return maybe_raise Errors::InvalidTypeError, "function abs() expects a number"
         end
       end
     end
@@ -96,18 +104,18 @@ module JMESPath
         if args.count == 1
           values = args.first
         else
-          raise Errors::InvalidArityError, "function avg() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function avg() expects one argument"
         end
         if Array === values
           values.inject(0) do |total,n|
             if Numeric === n
               total + n
             else
-              raise Errors::InvalidTypeError, "function avg() expects numeric values"
+              return maybe_raise Errors::InvalidTypeError, "function avg() expects numeric values"
             end
           end / values.size.to_f
         else
-          raise Errors::InvalidTypeError, "function avg() expects a number"
+          return maybe_raise Errors::InvalidTypeError, "function avg() expects a number"
         end
       end
     end
@@ -119,12 +127,12 @@ module JMESPath
         if args.count == 1
           value = args.first
         else
-          raise Errors::InvalidArityError, "function ceil() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function ceil() expects one argument"
         end
         if Numeric === value
           value.ceil
         else
-          raise Errors::InvalidTypeError, "function ceil() expects a numeric value"
+          return maybe_raise Errors::InvalidTypeError, "function ceil() expects a numeric value"
         end
       end
     end
@@ -139,10 +147,10 @@ module JMESPath
           if String === haystack || Array === haystack
             haystack.include?(needle)
           else
-            raise Errors::InvalidTypeError, "contains expects 2nd arg to be a list"
+            return maybe_raise Errors::InvalidTypeError, "contains expects 2nd arg to be a list"
           end
         else
-          raise Errors::InvalidArityError, "function contains() expects 2 arguments"
+          return maybe_raise Errors::InvalidArityError, "function contains() expects 2 arguments"
         end
       end
     end
@@ -154,12 +162,12 @@ module JMESPath
         if args.count == 1
           value = args.first
         else
-          raise Errors::InvalidArityError, "function floor() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function floor() expects one argument"
         end
         if Numeric === value
           value.floor
         else
-          raise Errors::InvalidTypeError, "function floor() expects a numeric value"
+          return maybe_raise Errors::InvalidTypeError, "function floor() expects a numeric value"
         end
       end
     end
@@ -171,11 +179,11 @@ module JMESPath
         if args.count == 1
           value = args.first
         else
-          raise Errors::InvalidArityError, "function length() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function length() expects one argument"
         end
         case value
         when Hash, Array, String then value.size
-        else raise Errors::InvalidTypeError, "function length() expects string, array or object"
+        else return maybe_raise Errors::InvalidTypeError, "function length() expects string, array or object"
         end
       end
     end
@@ -189,7 +197,7 @@ module JMESPath
         if args.count == 1
           values = args.first
         else
-          raise Errors::InvalidArityError, "function max() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function max() expects one argument"
         end
         if Array === values
           return nil if values.empty?
@@ -197,7 +205,7 @@ module JMESPath
           first_type = get_type(first)
           unless first_type == NUMBER_TYPE || first_type == STRING_TYPE
             msg = "function max() expects numeric or string values"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
           values.inject([first, first_type]) do |(max, max_type), v|
             v_type = get_type(v)
@@ -206,11 +214,11 @@ module JMESPath
             else
               msg = "function max() encountered a type mismatch in sequence: "
               msg << "#{max_type}, #{v_type}"
-              raise Errors::InvalidTypeError, msg
+              return maybe_raise Errors::InvalidTypeError, msg
             end
           end.first
         else
-          raise Errors::InvalidTypeError, "function max() expects an array"
+          return maybe_raise Errors::InvalidTypeError, "function max() expects an array"
         end
       end
     end
@@ -224,7 +232,7 @@ module JMESPath
         if args.count == 1
           values = args.first
         else
-          raise Errors::InvalidArityError, "function min() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function min() expects one argument"
         end
         if Array === values
           return nil if values.empty?
@@ -232,7 +240,7 @@ module JMESPath
           first_type = get_type(first)
           unless first_type == NUMBER_TYPE || first_type == STRING_TYPE
             msg = "function min() expects numeric or string values"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
           values.inject([first, first_type]) do |(min, min_type), v|
             v_type = get_type(v)
@@ -241,11 +249,11 @@ module JMESPath
             else
               msg = "function min() encountered a type mismatch in sequence: "
               msg << "#{min_type}, #{v_type}"
-              raise Errors::InvalidTypeError, msg
+              return maybe_raise Errors::InvalidTypeError, msg
             end
           end.first
         else
-          raise Errors::InvalidTypeError, "function min() expects an array"
+          return maybe_raise Errors::InvalidTypeError, "function min() expects an array"
         end
       end
     end
@@ -259,7 +267,7 @@ module JMESPath
         if args.count == 1
           TYPE_NAMES[get_type(args.first)]
         else
-          raise Errors::InvalidArityError, "function type() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function type() expects one argument"
         end
       end
     end
@@ -277,10 +285,10 @@ module JMESPath
             else raise NotImplementedError
             end
           else
-            raise Errors::InvalidTypeError, "function keys() expects a hash"
+            return maybe_raise Errors::InvalidTypeError, "function keys() expects a hash"
           end
         else
-          raise Errors::InvalidArityError, "function keys() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function keys() expects one argument"
         end
       end
     end
@@ -296,10 +304,10 @@ module JMESPath
           elsif Array === value
             value
           else
-            raise Errors::InvalidTypeError, "function values() expects an array or a hash"
+            return maybe_raise Errors::InvalidTypeError, "function values() expects an array or a hash"
           end
         else
-          raise Errors::InvalidArityError, "function values() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function values() expects one argument"
         end
       end
     end
@@ -312,14 +320,14 @@ module JMESPath
           glue = args[0]
           values = args[1]
           if !(String === glue)
-            raise Errors::InvalidTypeError, "function join() expects the first argument to be a string"
+            return maybe_raise Errors::InvalidTypeError, "function join() expects the first argument to be a string"
           elsif Array === values && values.all? { |v| String === v }
             values.join(glue)
           else
-            raise Errors::InvalidTypeError, "function join() expects values to be an array of strings"
+            return maybe_raise Errors::InvalidTypeError, "function join() expects values to be an array of strings"
           end
         else
-          raise Errors::InvalidArityError, "function join() expects an array of strings"
+          return maybe_raise Errors::InvalidArityError, "function join() expects an array of strings"
         end
       end
     end
@@ -332,7 +340,7 @@ module JMESPath
           value = args.first
           String === value ? value : JSON.dump(value)
         else
-          raise Errors::InvalidArityError, "function to_string() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function to_string() expects one argument"
         end
       end
     end
@@ -349,7 +357,7 @@ module JMESPath
             nil
           end
         else
-          raise Errors::InvalidArityError, "function to_number() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function to_number() expects one argument"
         end
       end
     end
@@ -363,11 +371,11 @@ module JMESPath
             if Numeric === n
               sum + n
             else
-              raise Errors::InvalidTypeError, "function sum() expects values to be numeric"
+              return maybe_raise Errors::InvalidTypeError, "function sum() expects values to be numeric"
             end
           end
         else
-          raise Errors::InvalidArityError, "function sum() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function sum() expects one argument"
         end
       end
     end
@@ -379,7 +387,7 @@ module JMESPath
         if args.count > 0
           args.find { |value| !value.nil? }
         else
-          raise Errors::InvalidArityError, "function not_null() expects one or more arguments"
+          return maybe_raise Errors::InvalidArityError, "function not_null() expects one or more arguments"
         end
       end
     end
@@ -399,14 +407,14 @@ module JMESPath
               if (a_type == STRING_TYPE || a_type == NUMBER_TYPE) && a_type == b_type
                 a <=> b
               else
-                raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+                return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
               end
             end
           else
-            raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+            return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
           end
         else
-          raise Errors::InvalidArityError, "function sort() expects one argument"
+          return maybe_raise Errors::InvalidArityError, "function sort() expects one argument"
         end
       end
     end
@@ -429,14 +437,14 @@ module JMESPath
               if (a_type == STRING_TYPE || a_type == NUMBER_TYPE) && a_type == b_type
                 a_value <=> b_value
               else
-                raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+                return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
               end
             end
           else
-            raise Errors::InvalidTypeError, "function sort_by() expects an array and an expression"
+            return maybe_raise Errors::InvalidTypeError, "function sort_by() expects an array and an expression"
           end
         else
-          raise Errors::InvalidArityError, "function sort_by() expects two arguments"
+          return maybe_raise Errors::InvalidArityError, "function sort_by() expects two arguments"
         end
       end
     end
@@ -452,7 +460,7 @@ module JMESPath
             type = get_type(expression.eval(values.first))
             if type != NUMBER_TYPE && type != STRING_TYPE
               msg = "function #{mode}() expects values to be strings or numbers"
-              raise Errors::InvalidTypeError, msg
+              return maybe_raise Errors::InvalidTypeError, msg
             end
             values.send(mode) do |entry|
               value = expression.eval(entry)
@@ -460,17 +468,17 @@ module JMESPath
               if value_type != type
                 msg = "function #{mode}() encountered a type mismatch in "
                 msg << "sequence: #{type}, #{value_type}"
-                raise Errors::InvalidTypeError, msg
+                return maybe_raise Errors::InvalidTypeError, msg
               end
               value
             end
           else
             msg = "function #{mode}() expects an array and an expression"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
         else
           msg = "function #{mode}() expects two arguments"
-          raise Errors::InvalidArityError, msg
+          return maybe_raise Errors::InvalidArityError, msg
         end
       end
     end
@@ -507,16 +515,16 @@ module JMESPath
           suffix_type = get_type(suffix)
           if search_type != STRING_TYPE
             msg = "function ends_with() expects first argument to be a string"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
           if suffix_type != STRING_TYPE
             msg = "function ends_with() expects second argument to be a string"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
           search.end_with?(suffix)
         else
           msg = "function ends_with() expects two arguments"
-          raise Errors::InvalidArityError, msg
+          return maybe_raise Errors::InvalidArityError, msg
         end
       end
     end
@@ -533,16 +541,16 @@ module JMESPath
           prefix_type = get_type(prefix)
           if search_type != STRING_TYPE
             msg = "function starts_with() expects first argument to be a string"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
           if prefix_type != STRING_TYPE
             msg = "function starts_with() expects second argument to be a string"
-            raise Errors::InvalidTypeError, msg
+            return maybe_raise Errors::InvalidTypeError, msg
           end
           search.start_with?(prefix)
         else
           msg = "function starts_with() expects two arguments"
-          raise Errors::InvalidArityError, msg
+          return maybe_raise Errors::InvalidArityError, msg
         end
       end
     end
@@ -553,7 +561,7 @@ module JMESPath
       def call(args)
         if args.count == 0
           msg = "function merge() expects 1 or more arguments"
-          raise Errors::InvalidArityError, msg
+          return maybe_raise Errors::InvalidArityError, msg
         end
         args.inject({}) do |h, v|
           h.merge(v)
@@ -567,14 +575,14 @@ module JMESPath
       def call(args)
         if args.count == 0
           msg = "function reverse() expects 1 or more arguments"
-          raise Errors::InvalidArityError, msg
+          return maybe_raise Errors::InvalidArityError, msg
         end
         value = args.first
         if Array === value || String === value
           value.reverse
         else
           msg = "function reverse() expects an array or string"
-          raise Errors::InvalidTypeError, msg
+          return maybe_raise Errors::InvalidTypeError, msg
         end
       end
     end
