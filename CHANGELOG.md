@@ -1,4 +1,4 @@
-Unreleased Changes
+1.1.0 (2015-09-16)
 ------------------
 
 * Updated the compliance tests. Pulled in the latest version from
