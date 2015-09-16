@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Fix for Ruby version 1.9.3 which does not support `#[]`
+  on `Enumerable` from Ruby stdlib.
+
 1.1.0 (2015-09-16)
 ------------------
 

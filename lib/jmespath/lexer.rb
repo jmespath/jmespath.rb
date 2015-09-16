@@ -161,7 +161,7 @@ module JMESPath
     def tokenize(expression)
 
       tokens = []
-      chars = CharacterStream.new(expression.chars)
+      chars = CharacterStream.new(expression.chars.to_a)
 
       while chars.current
         case TRANSLATION_TABLE[chars.current]
