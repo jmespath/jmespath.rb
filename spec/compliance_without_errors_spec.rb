@@ -32,7 +32,7 @@ describe 'Compliance' do
 
                   raised = nil
                   begin
-                    PARSER.parse(test_case['expression']).visit(scenario['given'])
+                    PARSER.parse(test_case['expression'])
                   rescue JMESPath::Errors::Error => error
                     raised = error
                   end
