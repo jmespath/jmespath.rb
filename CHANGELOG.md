@@ -1,6 +1,17 @@
 Unreleased Changes
 ------------------
 
+* Updated the compliance tests. Pulled in the latest version from
+  https://github.com/jmespath/jmespath.test at
+  [47fa72339d0e5a4d0e9a12264048fc580ed0bfd8](https://github.com/jmespath/jmespath.test/commit/47fa72339d0e5a4d0e9a12264048fc580ed0bfd8).
+
+* Adds a new JIT-friendly interpreter and AST optimizations that evaluating
+  expressions faster.
+
+  See [related GitHub pull request](https://github.com/jmespath/jmespath.rb/commit/33c44a68dc5a602908c7b7b341e4c07ccede69ce).
+
+* Removed dependency on `multi_json`.
+
 * Now running compliance tests as part of release process.
 
 1.0.2 (2014-12-04)
