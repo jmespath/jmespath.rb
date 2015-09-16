@@ -9,7 +9,7 @@ module JMESPath
 
       def visit(value)
         result = @left.visit(value)
-        if result.nil? or result.empty?
+        if result == false || result.nil? || result.empty?
           @right.visit(value)
         else
           result

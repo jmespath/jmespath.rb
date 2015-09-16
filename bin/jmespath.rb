@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-root = File.dirname(File.dirname(__FILE__))
-$:.unshift(File.join(root, 'lib'))
+$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'jmespath'
 require 'json'

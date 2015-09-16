@@ -4,29 +4,39 @@ module JMESPath
   # @api private
   class Parser
 
-    # @api private
     AFTER_DOT = Set.new([
-        :identifier,        # foo.bar
-        :quoted_identifier, # foo."bar"
-        :star,              # foo.*
-        :lbrace,            # foo[1]
-        :lbracket,          # foo{a: 0}
-        :function,          # foo.*.to_string(@)
-        :filter,            # foo.[?bar==10]
+      Lexer::T_IDENTIFIER,        # foo.bar
+      Lexer::T_QUOTED_IDENTIFIER, # foo."bar"
+      Lexer::T_STAR,              # foo.*
+      Lexer::T_LBRACE,            # foo{a: 0}
+      Lexer::T_LBRACKET,          # foo[1]
+      Lexer::T_FILTER,            # foo.[?bar==10]
+    ])
+
+    NUM_COLON_RBRACKET = Set.new([
+      Lexer::T_NUMBER,
+      Lexer::T_COLON,
+      Lexer::T_RBRACKET,
+    ])
+
+    COLON_RBRACKET = Set.new([
+      Lexer::T_COLON,
+      Lexer::T_RBRACKET,
     ])
 
     CURRENT_NODE = Nodes::Current.new
 
     # @option options [Lexer] :lexer
     def initialize(options = {})
-      @lexer = options[:lexer] || Lexer.new()
+      @lexer = options[:lexer] || Lexer.new
     end
 
     # @param [String<JMESPath>] expression
     def parse(expression)
-      stream = TokenStream.new(expression, @lexer.tokenize(expression))
+      tokens =  @lexer.tokenize(expression)
+      stream = TokenStream.new(expression, tokens)
       result = expr(stream)
-      if stream.token.type != :eof
+      if stream.token.type != Lexer::T_EOF
         raise Errors::SyntaxError, "expected :eof got #{stream.token.type}"
       else
         result
@@ -149,11 +159,11 @@ module JMESPath
     def led_filter(stream, left)
       stream.next
       expression = expr(stream)
-      if stream.token.type != :rbracket
+      if stream.token.type != Lexer::T_RBRACKET
         raise Errors::SyntaxError, 'expected a closing rbracket for the filter'
       end
       stream.next
-      rhs = parse_projection(stream, Token::BINDING_POWER[:filter])
+      rhs = parse_projection(stream, Token::BINDING_POWER[Lexer::T_FILTER])
       left ||= CURRENT_NODE
       right = Nodes::Condition.new(expression, rhs)
       Nodes::ArrayProjection.new(left, right)
@@ -203,24 +213,35 @@ module JMESPath
       Nodes::Pipe.new(left, right)
     end
 
+    # parse array index expressions, for example [0], [1:2:3], etc.
     def parse_array_index_expression(stream)
       pos = 0
       parts = [nil, nil, nil]
+      expected = NUM_COLON_RBRACKET
+
       begin
-        if stream.token.type == :colon
+        if stream.token.type == Lexer::T_COLON
           pos += 1
-        else
+          expected = NUM_COLON_RBRACKET
+        elsif stream.token.type == Lexer::T_NUMBER
           parts[pos] = stream.token.value
+          expected = COLON_RBRACKET
         end
-        stream.next(match:Set.new([:number, :colon, :rbracket]))
-      end while stream.token.type != :rbracket
-      stream.next
+        stream.next(match: expected)
+      end while stream.token.type != Lexer::T_RBRACKET
+
+      stream.next # consume the closing bracket
+
       if pos == 0
+        # no colons found, this is a single index extraction
         Nodes::Index.new(parts[0])
       elsif pos > 2
         raise Errors::SyntaxError, 'invalid array slice syntax: too many colons'
       else
-        Nodes::Slice.new(*parts)
+        Nodes::ArrayProjection.new(
+          Nodes::Slice.new(*parts),
+          parse_projection(stream, Token::BINDING_POWER[Lexer::T_STAR])
+        )
       end
     end
 
