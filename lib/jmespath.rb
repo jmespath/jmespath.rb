@@ -1,4 +1,5 @@
 require 'json'
+require 'stringio'
 require 'pathname'
 
 module JMESPath

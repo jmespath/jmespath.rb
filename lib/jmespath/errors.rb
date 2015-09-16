@@ -9,6 +9,8 @@ module JMESPath
 
     class InvalidTypeError < Error; end
 
+    class InvalidValueError < Error; end
+
     class InvalidArityError < Error; end
 
     class UnknownFunctionError < Error; end

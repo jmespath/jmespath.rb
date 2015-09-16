@@ -45,7 +45,7 @@ module JMESPath
         if step.nil?
           step = 1
         elsif step == 0
-          raise Errors::RuntimeError, 'slice step cannot be 0'
+          raise Errors::InvalidValueError, 'slice step cannot be 0'
         end
 
         if start.nil?
@@ -59,14 +59,13 @@ module JMESPath
         else
           stop = adjust_endpoint(length, stop, step)
         end
-
         [start, stop, step]
       end
 
       def adjust_endpoint(length, endpoint, step)
         if endpoint < 0
           endpoint += length
-          endpoint = 0 if endpoint < 0
+          endpoint = step < 0 ? -1 : 0 if endpoint < 0
           endpoint
         elsif endpoint >= length
           step < 0 ? length - 1 : length

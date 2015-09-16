@@ -2,6 +2,7 @@ module JMESPath
   # @api private
   module Nodes
     class Function < Node
+
       FUNCTIONS = {}
 
       def initialize(children)
@@ -180,6 +181,8 @@ module JMESPath
     end
 
     class MaxFunction < Function
+      include TypeChecker
+
       FUNCTIONS['max'] = self
 
       def call(args)
@@ -189,13 +192,23 @@ module JMESPath
           raise Errors::InvalidArityError, "function max() expects one argument"
         end
         if Array === values
-          values.inject(values.first) do |max, v|
-            if Numeric === v
-              v > max ? v : max
-            else
-              raise Errors::InvalidTypeError, "function max() expects numeric values"
-            end
+          return nil if values.empty?
+          first = values.first
+          first_type = get_type(first)
+          unless first_type == NUMBER_TYPE || first_type == STRING_TYPE
+            msg = "function max() expects numeric or string values"
+            raise Errors::InvalidTypeError, msg
           end
+          values.inject([first, first_type]) do |(max, max_type), v|
+            v_type = get_type(v)
+            if max_type == v_type
+              v > max ? [v, v_type] : [max, max_type]
+            else
+              msg = "function max() encountered a type mismatch in sequence: "
+              msg << "#{max_type}, #{v_type}"
+              raise Errors::InvalidTypeError, msg
+            end
+          end.first
         else
           raise Errors::InvalidTypeError, "function max() expects an array"
         end
@@ -203,6 +216,8 @@ module JMESPath
     end
 
     class MinFunction < Function
+      include TypeChecker
+
       FUNCTIONS['min'] = self
 
       def call(args)
@@ -212,13 +227,23 @@ module JMESPath
           raise Errors::InvalidArityError, "function min() expects one argument"
         end
         if Array === values
-          values.inject(values.first) do |min, v|
-            if Numeric === v
-              v < min ? v : min
-            else
-              raise Errors::InvalidTypeError, "function min() expects numeric values"
-            end
+          return nil if values.empty?
+          first = values.first
+          first_type = get_type(first)
+          unless first_type == NUMBER_TYPE || first_type == STRING_TYPE
+            msg = "function min() expects numeric or string values"
+            raise Errors::InvalidTypeError, msg
           end
+          values.inject([first, first_type]) do |(min, min_type), v|
+            v_type = get_type(v)
+            if min_type == v_type
+              v < min ? [v, v_type] : [min, min_type]
+            else
+              msg = "function min() encountered a type mismatch in sequence: "
+              msg << "#{min_type}, #{v_type}"
+              raise Errors::InvalidTypeError, msg
+            end
+          end.first
         else
           raise Errors::InvalidTypeError, "function min() expects an array"
         end
@@ -416,48 +441,150 @@ module JMESPath
       end
     end
 
-    module NumberComparator
+    module CompareBy
       include TypeChecker
 
-      def number_compare(mode, *args)
+      def compare_by(mode, *args)
         if args.count == 2
           values = args[0]
           expression = args[1]
           if get_type(values) == ARRAY_TYPE && get_type(expression) == EXPRESSION_TYPE
+            type = get_type(expression.eval(values.first))
+            if type != NUMBER_TYPE && type != STRING_TYPE
+              msg = "function #{mode}() expects values to be strings or numbers"
+              raise Errors::InvalidTypeError, msg
+            end
             values.send(mode) do |entry|
               value = expression.eval(entry)
-              if get_type(value) == NUMBER_TYPE
-                value
-              else
-                raise Errors::InvalidTypeError, "function #{mode}() expects values to be an numbers"
+              value_type = get_type(value)
+              if value_type != type
+                msg = "function #{mode}() encountered a type mismatch in "
+                msg << "sequence: #{type}, #{value_type}"
+                raise Errors::InvalidTypeError, msg
               end
+              value
             end
           else
-            raise Errors::InvalidTypeError, "function #{mode}() expects an array and an expression"
+            msg = "function #{mode}() expects an array and an expression"
+            raise Errors::InvalidTypeError, msg
           end
         else
-          raise Errors::InvalidArityError, "function #{mode}() expects two arguments"
+          msg = "function #{mode}() expects two arguments"
+          raise Errors::InvalidArityError, msg
         end
       end
     end
 
     class MaxByFunction < Function
-      include NumberComparator
+      include CompareBy
 
       FUNCTIONS['max_by'] = self
 
       def call(args)
-        number_compare(:max_by, *args)
+        compare_by(:max_by, *args)
       end
     end
 
     class MinByFunction < Function
-      include NumberComparator
+      include CompareBy
 
       FUNCTIONS['min_by'] = self
 
       def call(args)
-        number_compare(:min_by, *args)
+        compare_by(:min_by, *args)
+      end
+    end
+
+    class EndsWithFunction < Function
+      include TypeChecker
+
+      FUNCTIONS['ends_with'] = self
+
+      def call(args)
+        if args.count == 2
+          search, suffix = args
+          search_type = get_type(search)
+          suffix_type = get_type(suffix)
+          if search_type != STRING_TYPE
+            msg = "function ends_with() expects first argument to be a string"
+            raise Errors::InvalidTypeError, msg
+          end
+          if suffix_type != STRING_TYPE
+            msg = "function ends_with() expects second argument to be a string"
+            raise Errors::InvalidTypeError, msg
+          end
+          search.end_with?(suffix)
+        else
+          msg = "function ends_with() expects two arguments"
+          raise Errors::InvalidArityError, msg
+        end
+      end
+    end
+
+    class StartsWithFunction < Function
+      include TypeChecker
+
+      FUNCTIONS['starts_with'] = self
+
+      def call(args)
+        if args.count == 2
+          search, prefix = args
+          search_type = get_type(search)
+          prefix_type = get_type(prefix)
+          if search_type != STRING_TYPE
+            msg = "function starts_with() expects first argument to be a string"
+            raise Errors::InvalidTypeError, msg
+          end
+          if prefix_type != STRING_TYPE
+            msg = "function starts_with() expects second argument to be a string"
+            raise Errors::InvalidTypeError, msg
+          end
+          search.start_with?(prefix)
+        else
+          msg = "function starts_with() expects two arguments"
+          raise Errors::InvalidArityError, msg
+        end
+      end
+    end
+
+    class MergeFunction < Function
+      FUNCTIONS['merge'] = self
+
+      def call(args)
+        if args.count == 0
+          msg = "function merge() expects 1 or more arguments"
+          raise Errors::InvalidArityError, msg
+        end
+        args.inject({}) do |h, v|
+          h.merge(v)
+        end
+      end
+    end
+
+    class ReverseFunction < Function
+      FUNCTIONS['reverse'] = self
+
+      def call(args)
+        if args.count == 0
+          msg = "function reverse() expects 1 or more arguments"
+          raise Errors::InvalidArityError, msg
+        end
+        value = args.first
+        if Array === value || String === value
+          value.reverse
+        else
+          msg = "function reverse() expects an array or string"
+          raise Errors::InvalidTypeError, msg
+        end
+      end
+    end
+
+    class ToArrayFunction < Function
+      FUNCTIONS['to_array'] = self
+
+      def call(args)
+        value = args.first
+        Array === value ? value : [value]
       end
     end
   end
