@@ -62,13 +62,9 @@ module JMESPath
     end
 
     class ObjectProjection < Projection
-      EMPTY_ARRAY = [].freeze
-
       def extract_targets(target)
         if hash_like?(target)
           target.values
-        elsif target == EMPTY_ARRAY
-          EMPTY_ARRAY
         else
           nil
         end
