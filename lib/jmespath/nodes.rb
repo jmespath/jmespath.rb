@@ -19,6 +19,7 @@ module JMESPath
     end
 
     autoload :Comparator, 'jmespath/nodes/comparator'
+    autoload :Comparators, 'jmespath/nodes/comparator'
     autoload :Condition, 'jmespath/nodes/condition'
     autoload :Current, 'jmespath/nodes/current'
     autoload :Expression, 'jmespath/nodes/expression'
@@ -36,5 +37,6 @@ module JMESPath
     autoload :ObjectProjection, 'jmespath/nodes/projection'
     autoload :Slice, 'jmespath/nodes/slice'
     autoload :Subexpression, 'jmespath/nodes/subexpression'
+
   end
 end

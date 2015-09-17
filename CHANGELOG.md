@@ -1,6 +1,8 @@
 Unreleased Changes
 ------------------
 
+* Resolved an issue preventing eager autoloading of comparator classes.
+
 1.1.1 (2015-09-16)
 ------------------
 

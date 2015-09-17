@@ -40,7 +40,7 @@ module JMESPath
     end
 
     class EqCondition < ComparatorCondition
-      COMPARATOR_TO_CONDITION[EqComparator] = self
+      COMPARATOR_TO_CONDITION[Comparators::Eq] = self
 
       def visit(value)
         @left.visit(value) == @right.visit(value) ? @child.visit(value) : nil
@@ -67,7 +67,7 @@ module JMESPath
     end
 
     class NeqCondition < ComparatorCondition
-      COMPARATOR_TO_CONDITION[NeqComparator] = self
+      COMPARATOR_TO_CONDITION[Comparators::Neq] = self
 
       def visit(value)
         @left.visit(value) != @right.visit(value) ? @child.visit(value) : nil
@@ -94,7 +94,7 @@ module JMESPath
     end
 
     class GtCondition < ComparatorCondition
-      COMPARATOR_TO_CONDITION[GtComparator] = self
+      COMPARATOR_TO_CONDITION[Comparators::Gt] = self
 
       def visit(value)
         left_value = @left.visit(value)
@@ -104,7 +104,7 @@ module JMESPath
     end
 
     class GteCondition < ComparatorCondition
-      COMPARATOR_TO_CONDITION[GteComparator] = self
+      COMPARATOR_TO_CONDITION[Comparators::Gte] = self
 
       def visit(value)
         left_value = @left.visit(value)
@@ -114,7 +114,7 @@ module JMESPath
     end
 
     class LtCondition < ComparatorCondition
-      COMPARATOR_TO_CONDITION[LtComparator] = self
+      COMPARATOR_TO_CONDITION[Comparators::Lt] = self
 
       def visit(value)
         left_value = @left.visit(value)
@@ -124,7 +124,7 @@ module JMESPath
     end
 
     class LteCondition < ComparatorCondition
-      COMPARATOR_TO_CONDITION[LteComparator] = self
+      COMPARATOR_TO_CONDITION[Comparators::Lte] = self
 
       def visit(value)
         left_value = @left.visit(value)
