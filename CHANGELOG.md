@@ -1,4 +1,4 @@
-Unreleased Changes
+1.1.3 (2015-09-16)
 ------------------
 
 * Removed json gem dependency.
