@@ -46,8 +46,8 @@ module JMESPath
         end
       end
 
-      def visit(value)
-        @keys.reduce(value) do |value, key|
+      def visit(obj)
+        @keys.reduce(obj) do |value, key|
           if value.is_a?(Array) && key.is_a?(Integer)
             value[key]
           elsif value.is_a?(Hash)
@@ -68,7 +68,10 @@ module JMESPath
 
       private
 
-      attr_reader :keys
+      def keys
+        @keys
+      end
+
     end
   end
 end
