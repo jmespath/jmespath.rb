@@ -1,6 +1,6 @@
 [{
     "given":
-        {"outer": {"foo": "foo", "bar": "bar", "baz": "baz"}},
+        {"outer": {"foo": "foo", "bar": "bar", "baz": "baz"}, "primitives": {"t": true, "f": false, "n": null}},
      "cases": [
          {
             "expression": "outer.foo || outer.bar",
@@ -41,6 +41,18 @@
          {
             "expression": "outer.bad||outer.alsobad",
             "result": null
+         },
+         {
+            "expression": "primitives.t || outer.foo",
+            "result": true
+         },
+         {
+            "expression": "primitives.f || outer.foo",
+            "result": "foo"
+         },
+         {
+            "expression": "primitives.n || outer.foo",
+            "result": "foo"
          }
      ]
 }, {
