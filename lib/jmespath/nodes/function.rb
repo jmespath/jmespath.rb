@@ -194,17 +194,17 @@ module JMESPath
 
       def call(args)
         if args.count != 2
-          raise Errors::InvalidArityError, "function map() expects two arguments"
+          return maybe_raise Errors::InvalidArityError, "function map() expects two arguments"
         end
         if Nodes::Expression === args[0]
           expr = args[0]
         else
-          raise Errors::InvalidTypeError, "function map() expects the first argument to be an expression"
+          return maybe_raise Errors::InvalidTypeError, "function map() expects the first argument to be an expression"
         end
         if Array === args[1]
           list = args[1]
         else
-          raise Errors::InvalidTypeError, "function map() expects the second argument to be an list"
+          return maybe_raise Errors::InvalidTypeError, "function map() expects the second argument to be an list"
         end
         list.map { |value| expr.eval(value) }
     end
