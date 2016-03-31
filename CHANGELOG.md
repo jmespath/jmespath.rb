@@ -1,11 +1,12 @@
 Unreleased Changes
 ------------------
 
+* Minor change in require order.
+
 1.2 (2016-03-30)
 ------------------
 
-*
-  Errors caused by invalid function arguments normally raise
+* Errors caused by invalid function arguments normally raise
   an arity or argument error. You can now prevent `JMESPath.search`
   from raising these errors by passing `disable_visit_error: true`.
 
