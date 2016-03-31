@@ -1,4 +1,4 @@
-Unreleased Changes
+1.2.1 (2016-03-31)
 ------------------
 
 * Minor change in require order.
