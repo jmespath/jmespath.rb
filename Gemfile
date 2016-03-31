@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake', require: false
-gem 'json', '>= 1.8.1'
+gem 'json_pure', '>= 1.8.1'
 
 group :test do
   gem 'rspec', '~> 3.0'
