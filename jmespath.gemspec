@@ -9,5 +9,5 @@ Gem::Specification.new do |spec|
   spec.license       = 'Apache 2.0'
   spec.require_paths = ['lib']
   spec.files         = Dir['lib/**/*.rb'] + ['LICENSE.txt']
-  spec.add_runtime_dependency 'json', '>= 1.8.1'
+  spec.add_runtime_dependency 'json_pure', '>= 1.8.1'
 end

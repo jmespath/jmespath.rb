@@ -1,6 +1,14 @@
-gem('json', '>= 1.8.1') # fix for Ruby 1.9.3
+begin
+  # Attempt to load the native version if available, not availble
+  # by default for Ruby 1.9.3.
+  gem('json', '>= 1.8.1')
+  require 'json/ext'
+rescue Gem::LoadError
+  # Fallback on the json_pure gem dependency.
+  gem('json_pure', '>= 1.8.1')
+  require 'json/pure'
+end
 
-require 'json'
 require 'stringio'
 require 'pathname'
 

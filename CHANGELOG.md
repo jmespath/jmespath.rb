@@ -1,3 +1,13 @@
+Unreleased Changes
+------------------
+
+* Removed hard dependency on `json >= 1.8.1`. Replaced with `json_pure >= 1.8.1`.
+  The runtime will still attempt to load the faster gem, if availble and will fall
+  back on `json_pure` for compatability. Ruby 2.0+ ships with 1.8.1 by default,
+  so only Ruby 1.9.3 will default to the slower version.
+
+  [See related GitHub issue #18](https://github.com/jmespath/jmespath.rb/pull/18).
+
 1.2.1 (2016-03-31)
 ------------------
 
