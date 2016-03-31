@@ -18,6 +18,7 @@ module JMESPath
       end
     end
 
+    autoload :And, 'jmespath/nodes/and'
     autoload :Comparator, 'jmespath/nodes/comparator'
     autoload :Comparators, 'jmespath/nodes/comparator'
     autoload :Condition, 'jmespath/nodes/condition'
@@ -30,6 +31,7 @@ module JMESPath
     autoload :Literal, 'jmespath/nodes/literal'
     autoload :MultiSelectHash, 'jmespath/nodes/multi_select_hash'
     autoload :MultiSelectList, 'jmespath/nodes/multi_select_list'
+    autoload :Not, 'jmespath/nodes/not'
     autoload :Or, 'jmespath/nodes/or'
     autoload :Pipe, 'jmespath/nodes/pipe'
     autoload :Projection, 'jmespath/nodes/projection'

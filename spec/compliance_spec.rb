@@ -6,7 +6,12 @@ SimpleCov.command_name('test:compliance')
 
 describe 'Compliance' do
   Dir.glob('spec/compliance/*.json').each do |path|
-    describe(File.basename(path).split('.').first) do
+
+    test_file = File.basename(path).split('.').first
+    next if test_file == 'benchmarks'
+    next if ENV['TEST_FILE'] && ENV['TEST_FILE'] != test_file
+
+    describe(test_file) do
       JMESPath.load_json(path).each do |scenario|
         describe("Given #{JSON.dump(scenario['given'])}") do
           scenario['cases'].each do |test_case|

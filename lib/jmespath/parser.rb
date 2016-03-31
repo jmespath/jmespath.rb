@@ -71,7 +71,22 @@ module JMESPath
 
     def nud_expref(stream)
       stream.next
-      Nodes::Expression.new(expr(stream, 2))
+      Nodes::Expression.new(expr(stream, Token::BINDING_POWER[:expref]))
+    end
+
+    def nud_not(stream)
+      stream.next
+      Nodes::Not.new(expr(stream, Token::BINDING_POWER[:not]))
+    end
+
+    def nud_lparen(stream)
+      stream.next
+      result = expr(stream, 0)
+      if stream.token.type != Lexer::T_RPAREN
+        raise Errors::SyntaxError, 'Unclosed `(`'
+      end
+      stream.next
+      result
     end
 
     def nud_filter(stream)
@@ -142,7 +157,7 @@ module JMESPath
     def led_comparator(stream, left)
       token = stream.token
       stream.next
-      right = expr(stream)
+      right = expr(stream, Token::BINDING_POWER[:comparator])
       Nodes::Comparator.create(token.value, left, right)
     end
 
@@ -189,7 +204,11 @@ module JMESPath
 
     def led_lparen(stream, left)
       args = []
-      name = left.name
+      if Nodes::Function::FunctionName === left
+        name = left.name
+      else
+        raise Errors::SyntaxError, 'invalid function invocation'
+      end
       stream.next
       while stream.token.type != :rparen
         args << expr(stream, 0)
@@ -205,6 +224,12 @@ module JMESPath
       stream.next
       right = expr(stream, Token::BINDING_POWER[:or])
       Nodes::Or.new(left, right)
+    end
+
+    def led_and(stream, left)
+      stream.next
+      right = expr(stream, Token::BINDING_POWER[:or])
+      Nodes::And.new(left, right)
     end
 
     def led_pipe(stream, left)

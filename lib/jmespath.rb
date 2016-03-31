@@ -13,6 +13,7 @@ module JMESPath
   autoload :Runtime, 'jmespath/runtime'
   autoload :Token, 'jmespath/token'
   autoload :TokenStream, 'jmespath/token_stream'
+  autoload :Util, 'jmespath/util'
   autoload :VERSION, 'jmespath/version'
 
   class << self

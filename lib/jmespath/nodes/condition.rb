@@ -8,10 +8,10 @@ module JMESPath
       end
 
       def visit(value)
-        if @test.visit(value)
-          @child.visit(value)
-        else
+        if JMESPath::Util.falsey?(@test.visit(value))
           nil
+        else
+          @child.visit(value)
         end
       end
 

@@ -24,6 +24,8 @@ module JMESPath
     T_UNKNOWN = :unknown
     T_PIPE = :pipe
     T_OR = :or
+    T_AND = :and
+    T_NOT = :not
     T_FILTER = :filter
     T_LITERAL = :literal
     T_EOF = :eof
@@ -42,6 +44,7 @@ module JMESPath
     STATE_GT = 10
     STATE_EQ = 11
     STATE_NOT = 12
+    STATE_AND = 13
 
     TRANSLATION_TABLE = {
       '<'  => STATE_LT,
@@ -50,6 +53,7 @@ module JMESPath
       '!'  => STATE_NOT,
       '['  => STATE_LBRACKET,
       '|'  => STATE_PIPE,
+      '&'  => STATE_AND,
       '`'  => STATE_JSON_LITERAL,
       '"'  => STATE_QUOTED_STRING,
       "'"  => STATE_STRING_LITERAL,
@@ -74,7 +78,6 @@ module JMESPath
       ','  => STATE_SINGLE_CHAR,
       ':'  => STATE_SINGLE_CHAR,
       '@'  => STATE_SINGLE_CHAR,
-      '&'  => STATE_SINGLE_CHAR,
       '('  => STATE_SINGLE_CHAR,
       ')'  => STATE_SINGLE_CHAR,
       '{'  => STATE_SINGLE_CHAR,
@@ -149,7 +152,6 @@ module JMESPath
       ',' => T_COMMA,
       ':' => T_COLON,
       '@' => T_CURRENT,
-      '&' => T_EXPREF,
       '(' => T_LPAREN,
       ')' => T_RPAREN,
       '{' => T_LBRACE,
@@ -210,7 +212,9 @@ module JMESPath
           end
         when STATE_STRING_LITERAL
           # consume raw string literals
-          tokens << inside(chars, "'", T_LITERAL)
+          t = inside(chars, "'", T_LITERAL)
+          t.value = t.value.gsub("\\'", "'")
+          tokens << t
         when STATE_PIPE
           # consume pipe and OR
           tokens << match_or(chars, '|', '|', T_OR, T_PIPE)
@@ -245,9 +249,11 @@ module JMESPath
         when STATE_EQ
           # consume equals
           tokens << match_or(chars, '=', '=', T_COMPARATOR, T_UNKNOWN)
+        when STATE_AND
+          tokens << match_or(chars, '&', '&', T_AND, T_EXPREF)
         when STATE_NOT
           # consume not equals
-          tokens << match_or(chars, '!', '=', T_COMPARATOR, T_UNKNOWN)
+          tokens << match_or(chars, '!', '=', T_COMPARATOR, T_NOT);
         else
           # either '<' or '>'
           # consume less than and greater than

@@ -1,6 +1,13 @@
 Unreleased Changes
 ------------------
 
+* Updated code to pass the latest shared compliance tests.
+
+* Added support for the `map` function.
+
+* Added support for [JEP-9](https://github.com/jmespath/jmespath.site/blob/master/docs/proposals/improved-filters.rst),
+  including unary filter expressions, and `&&` filter expressions.
+
 1.1.3 (2015-09-16)
 ------------------
 
