@@ -3,7 +3,7 @@ module JMESPath
   class Runtime
 
     # @api private
-    DEFAULT_PARSER = CachingParser.new
+    DEFAULT_PARSER = CachingParser
 
     # Constructs a new runtime object for evaluating JMESPath expressions.
     #
@@ -35,6 +35,11 @@ module JMESPath
     #   caching parser will be used. When `true`, a shared instance of
     #   {CachingParser} is used.  Defaults to `true`.
     #
+    # @option options [Boolean] :disable_visit_errors (false) When `true`,
+    #   no errors will be raised during runtime processing. Parse errors
+    #   will still be raised, but unexpected data sent to visit will
+    #   result in nil being returned.
+    #
     # @option options [Parser,CachingParser] :parser
     #
     def initialize(options = {})
@@ -58,7 +63,7 @@ module JMESPath
       if options[:cache_expressions] == false
         Parser.new(options)
       else
-        DEFAULT_PARSER
+        DEFAULT_PARSER.new(options)
       end
     end
 
