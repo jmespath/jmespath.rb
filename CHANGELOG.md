@@ -1,4 +1,4 @@
-Unreleased Changes
+1.2.2 (2016-03-31)
 ------------------
 
 * Removed hard dependency on `json >= 1.8.1`. Replaced with `json_pure >= 1.8.1`.
