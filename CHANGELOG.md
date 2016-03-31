@@ -1,6 +1,19 @@
 Unreleased Changes
 ------------------
 
+*
+  Errors caused by invalid function arguments normally raise
+  an arity or argument error. You can now prevent `JMESPath.search`
+  from raising these errors by passing `disable_visit_error: true`.
+
+  ```
+  JMESPath.search(expression, data, disable_visit_errors: true)
+  ```
+
+  This will cause these functions to return a null/nil value instead.
+
+  [See related GitHub issue #10](https://github.com/jmespath/jmespath.rb/pull/10).
+
 * Fix for Ruby 1.9.3. Older versions of Ruby ship with a version of the json
   gem that can not perform the following:
 
