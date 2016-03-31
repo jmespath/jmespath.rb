@@ -1,6 +1,19 @@
 Unreleased Changes
 ------------------
 
+* Fix for Ruby 1.9.3. Older versions of Ruby ship with a version of the json
+  gem that can not perform the following:
+
+  ```ruby
+  JSON.load('1')
+  ```
+
+  This results in the JMESPath library in assuming is parsing an unknown or
+  invalid token. This works fine newer versions of Ruby. To resolve this issue
+  the library is forcing a newer version of the `json` gem.
+
+  [Fixes GitHub issue #11](https://github.com/jmespath/jmespath.rb/issues/11).
+
 * Fix for boolean truthy checks.
   [See related GitHub issue #15](https://github.com/jmespath/jmespath.rb/pull/15).
 

@@ -1,3 +1,5 @@
+gem('json', '>= 1.8.1') # fix for Ruby 1.9.3
+
 require 'json'
 require 'set'
 

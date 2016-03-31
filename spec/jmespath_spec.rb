@@ -27,5 +27,12 @@ module JMESPath
       expect(JMESPath.search('foo.bar', data)).to eq('baz')
     end
 
+    it 'supports bare JSON literals' do
+      # this is problematic in older Ruby versions that ship with
+      # older versions of the json gem. This will only work
+      # with version 1.8.1+ of the json gem.
+      expect(JMESPath.search('`1` < `2`', {})).to be(true)
+    end
+
   end
 end
