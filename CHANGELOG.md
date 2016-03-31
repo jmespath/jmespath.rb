@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Fix for boolean truthy checks.
+  [See related GitHub issue #15](https://github.com/jmespath/jmespath.rb/pull/15).
+
 * Updated code to pass the latest shared compliance tests.
 
 * Added support for the `map` function.
