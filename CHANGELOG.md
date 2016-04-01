@@ -1,4 +1,4 @@
-Unreleased Changes
+1.2.3 (2016-04-01)
 ------------------
 
 * Will no longer require json_pure if the json gem has already been loaded.
