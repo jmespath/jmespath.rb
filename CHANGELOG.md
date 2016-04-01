@@ -1,6 +1,20 @@
 Unreleased Changes
 ------------------
 
+* Will no longer require json_pure if the json gem has already been loaded.
+  This will result in a warning and a degraded experience if json < 1.8.1
+  has already been loaded.
+
+  Mixing json/pure with json/ext results in json errors, for example:
+
+  ```ruby
+  some_hash = { 'jsonrpc' => 'abc', 'jsonversion' => 1 }
+  some_hash.to_json
+  #=> raises a JSON::Pure::Generator::State TypeError
+  ```
+
+  [See related GitHub issue #20](https://github.com/jmespath/jmespath.rb/issues/20).
+
 1.2.2 (2016-03-31)
 ------------------
 
