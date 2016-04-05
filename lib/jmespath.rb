@@ -5,11 +5,11 @@ else
     # Attempt to load the native version if available, not availble
     # by default for Ruby 1.9.3.
     gem('json', '>= 1.8.1')
-    require 'json/ext'
+    require 'json'
   rescue Gem::LoadError
     # Fallback on the json_pure gem dependency.
     gem('json_pure', '>= 1.8.1')
-    require 'json/pure'
+    require 'json'
   end
 end
 
