@@ -1,4 +1,4 @@
-1.2.3 (2016-04-01)
+1.2.4 (2016-04-06)
 ------------------
 
 * Will no longer require json_pure if the json gem has already been loaded.
