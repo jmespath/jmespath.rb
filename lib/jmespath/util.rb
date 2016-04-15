@@ -8,15 +8,11 @@ module JMESPath
       #   https://github.com/jmespath/jmespath.site/blob/master/docs/proposals/improved-filters.rst#and-expressions-1
       #
       def falsey?(value)
-        value.nil? ||
-        value === false ||
-        value == '' ||
-        value == {} ||
-        value == [] ||
-        (value.respond_to?(:entries) && value.entries.compact.empty?)
+        !value ||
+        (value.respond_to?(:empty?) && value.empty?) ||
+        (value.respond_to?(:entries) && !value.entries.any?)
         # final case necessary to support Enumerable and Struct
       end
-
     end
   end
 end
