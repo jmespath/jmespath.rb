@@ -46,7 +46,7 @@ module JMESPath
 
     # @api private
     def method_missing(method_name, *args)
-      if matches = method_name.match(/^(nud_|led_)(.*)/)
+      if matches = method_name.to_s.match(/^(nud_|led_)(.*)/)
         raise Errors::SyntaxError, "unexpected token #{matches[2]}"
       else
         super
@@ -153,6 +153,10 @@ module JMESPath
 
     def nud_star(stream)
       parse_wildcard_object(stream, CURRENT_NODE)
+    end
+
+    def nud_unknown(stream)
+      raise Errors::SyntaxError, "unknown token #{stream.token.value.inspect}"
     end
 
     def led_comparator(stream, left)
