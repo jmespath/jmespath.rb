@@ -1,16 +1,24 @@
-if Object.const_defined?(:JSON) && JSON::VERSION < '1.8.1'
-  warn("WARNING: jmespath gem requires json gem >= 1.8.1; json #{JSON::VERSION} already loaded")
-else
+def fallback_gem
   begin
-    # Attempt to load the native version if available, not availble
-    # by default for Ruby 1.9.3.
-    gem('json', '>= 1.8.1')
-    require 'json'
-  rescue Gem::LoadError
     # Fallback on the json_pure gem dependency.
     gem('json_pure', '>= 1.8.1')
     require 'json'
+  rescue Gem::LoadError
+    if Object.const_defined?(:JSON) && JSON::VERSION < '1.8.1'
+      warn("WARNING: jmespath gem requires json gem >= 1.8.1; json #{JSON::VERSION} already loaded")
+    else
+      warn("ERROR: unable to load any json library")
+    end
   end
+end
+
+begin
+  # Attempt to load the native version if available, not availble
+  # by default for Ruby 1.9.3.
+  gem('json', '>= 1.8.1')
+  require 'json'
+rescue Gem::LoadError
+  fallback_gem
 end
 
 require 'stringio'
