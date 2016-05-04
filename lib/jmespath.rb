@@ -18,17 +18,16 @@ require 'pathname'
 
 module JMESPath
 
-  autoload :CachingParser, 'jmespath/caching_parser'
-  autoload :Errors, 'jmespath/errors'
-  autoload :ExprNode, 'jmespath/expr_node'
-  autoload :Lexer, 'jmespath/lexer'
-  autoload :Nodes, 'jmespath/nodes'
-  autoload :Parser, 'jmespath/parser'
-  autoload :Runtime, 'jmespath/runtime'
-  autoload :Token, 'jmespath/token'
-  autoload :TokenStream, 'jmespath/token_stream'
-  autoload :Util, 'jmespath/util'
-  autoload :VERSION, 'jmespath/version'
+  require 'jmespath/caching_parser'
+  require 'jmespath/errors'
+  require 'jmespath/lexer'
+  require 'jmespath/nodes'
+  require 'jmespath/parser'
+  require 'jmespath/runtime'
+  require 'jmespath/token'
+  require 'jmespath/token_stream'
+  require 'jmespath/util'
+  require 'jmespath/version'
 
   class << self
 
