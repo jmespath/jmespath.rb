@@ -1,5 +1,7 @@
-require 'simplecov'
-require 'jmespath'
 require 'rspec'
-
-SimpleCov.command_name('test:unit')
+begin
+  require 'simplecov'
+  SimpleCov.command_name('test:unit')
+rescue LoadError
+end
+require 'jmespath'
