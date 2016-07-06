@@ -1,8 +1,10 @@
-require 'simplecov'
-require 'jmespath'
 require 'rspec'
-
-SimpleCov.command_name('test:compliance')
+begin
+  require 'simplecov'
+  SimpleCov.command_name('test:compliance')
+rescue LoadError
+end
+require 'jmespath'
 
 describe 'Compliance' do
   Dir.glob('spec/compliance/*.json').each do |path|
@@ -13,7 +15,7 @@ describe 'Compliance' do
 
     describe(test_file) do
       JMESPath.load_json(path).each do |scenario|
-        describe("Given #{JSON.dump(scenario['given'])}") do
+        describe("Given #{scenario['given'].to_json}") do
           scenario['cases'].each do |test_case|
 
             if test_case['error']
@@ -42,7 +44,7 @@ describe 'Compliance' do
 
             else
 
-              it "searching #{test_case['expression'].inspect} returns #{JSON.dump(test_case['result'])}" do
+              it "searching #{test_case['expression'].inspect} returns #{test_case['result'].to_json}" do
                 result = JMESPath.search(test_case['expression'], scenario['given'])
                 expect(result).to eq(test_case['result'])
               end

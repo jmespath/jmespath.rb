@@ -295,13 +295,24 @@ module JMESPath
       Token.new(type, buffer.join, position)
     end
 
-    def parse_json(token)
-      begin
-        token.value = JSON.load(token.value)
-      rescue JSON::ParserError
-        token.type = T_UNKNOWN
+    if RUBY_VERSION.match(Regexp.escape('1.9.3'))
+      def parse_json(token)
+        begin
+          token.value = JSON.load("{\"value\":#{token.value}}")['value']
+        rescue JSON::ParserError
+          token.type = T_UNKNOWN
+        end
+        token
       end
-      token
+    else
+      def parse_json(token)
+        begin
+          token.value = JSON.load(token.value)
+        rescue JSON::ParserError
+          token.type = T_UNKNOWN
+        end
+        token
+      end
     end
 
     class CharacterStream

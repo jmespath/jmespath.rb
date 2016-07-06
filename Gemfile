@@ -1,11 +1,10 @@
 source 'https://rubygems.org'
 
 gem 'rake', require: false
-gem 'json_pure', '>= 1.8.1'
 
 group :test do
   gem 'rspec', '~> 3.0'
-  gem 'simplecov'
+  gem 'simplecov' unless RUBY_VERSION == '1.9.3'
 end
 
 group :docs do

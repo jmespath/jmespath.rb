@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Removed depdendency on `pure_json` gem. Necessary code changes have been
+  made to ensure things work properly with Ruby 1.9.3 and JSON 1.5.5.
+
 * Bug-fix for Ruby 2.3. JMESPath requires sort and sort_by functions to be stable.
   There was a persistent test failure in Ruby 2.3 due to an unstable sort.
 
