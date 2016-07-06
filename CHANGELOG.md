@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Bug-fix for Ruby 2.3. JMESPath requires sort and sort_by functions to be stable.
+  There was a persistent test failure in Ruby 2.3 due to an unstable sort.
+
 1.2.4 (2016-04-06)
 ------------------
 

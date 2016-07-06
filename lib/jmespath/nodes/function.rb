@@ -424,14 +424,22 @@ module JMESPath
         if args.count == 1
           value = args.first
           if Array === value
-            value.sort do |a, b|
-              a_type = get_type(a)
-              b_type = get_type(b)
-              if (a_type == STRING_TYPE || a_type == NUMBER_TYPE) && a_type == b_type
-                a <=> b
-              else
-                return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+            # every element in the list must be of the same type
+            array_type = get_type(value[0])
+            if array_type == STRING_TYPE || array_type == NUMBER_TYPE || value.size == 0
+              # stable sort
+              n = 0
+              value.sort_by do |v|
+                value_type = get_type(v)
+                if value_type != array_type
+                  msg = "function sort() expects values to be an array of only numbers, or only integers"
+                  return maybe_raise Errors::InvalidTypeError, msg
+                end
+                n += 1
+                [v, n]
               end
+            else
+              return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
             end
           else
             return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
@@ -452,16 +460,22 @@ module JMESPath
           if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
             values = args[0]
             expression = args[1]
-            values.sort do |a,b|
-              a_value = expression.eval(a)
-              b_value = expression.eval(b)
-              a_type = get_type(a_value)
-              b_type = get_type(b_value)
-              if (a_type == STRING_TYPE || a_type == NUMBER_TYPE) && a_type == b_type
-                a_value <=> b_value
-              else
-                return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
+            array_type = get_type(expression.eval(values[0]))
+            if array_type == STRING_TYPE || array_type == NUMBER_TYPE || values.size == 0
+              # stable sort the list
+              n = 0
+              values.sort_by do |value|
+                value = expression.eval(value)
+                value_type = get_type(value)
+                if value_type != array_type
+                  msg = "function sort() expects values to be an array of only numbers, or only integers"
+                  return maybe_raise Errors::InvalidTypeError, msg
+                end
+                n += 1
+                [value, n]
               end
+            else
+              return maybe_raise Errors::InvalidTypeError, "function sort() expects values to be an array of numbers or integers"
             end
           else
             return maybe_raise Errors::InvalidTypeError, "function sort_by() expects an array and an expression"
