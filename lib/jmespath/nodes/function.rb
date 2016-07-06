@@ -361,7 +361,7 @@ module JMESPath
       def call(args)
         if args.count == 1
           value = args.first
-          String === value ? value : JSON.dump(value)
+          String === value ? value : value.to_json
         else
           return maybe_raise Errors::InvalidArityError, "function to_string() expects one argument"
         end

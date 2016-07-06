@@ -15,7 +15,7 @@ describe 'Compliance' do
 
     describe(test_file) do
       JMESPath.load_json(path).each do |scenario|
-        describe("Given #{JSON.dump(scenario['given'])}") do
+        describe("Given #{scenario['given'].to_json}") do
           scenario['cases'].each do |test_case|
 
             if test_case['error']
@@ -44,7 +44,7 @@ describe 'Compliance' do
 
             else
 
-              it "searching #{test_case['expression'].inspect} returns #{JSON.dump(test_case['result'])}" do
+              it "searching #{test_case['expression'].inspect} returns #{test_case['result'].to_json}" do
                 result = JMESPath.search(test_case['expression'], scenario['given'])
                 expect(result).to eq(test_case['result'])
               end
