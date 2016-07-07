@@ -1,6 +1,18 @@
 Unreleased Changes
 ------------------
 
+* Restored support for legacy unquoted string literals.
+
+  [See related GitHub pull request #32](https://github.com/jmespath/jmespath.rb/pull/32).
+
+* Improved error handling for invalid JSON values.
+
+  [See related GitHub pull request #29](https://github.com/jmespath/jmespath.rb/pull/29).
+
+* Optimised false checks.
+
+  [See related GitHub pull request #24](https://github.com/jmespath/jmespath.rb/pull/24).
+
 * Removed depdendency on `pure_json` gem. Necessary code changes have been
   made to ensure things work properly with Ruby 1.9.3 and JSON 1.5.5.
 
