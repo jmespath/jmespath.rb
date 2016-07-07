@@ -155,6 +155,10 @@ module JMESPath
       parse_wildcard_object(stream, CURRENT_NODE)
     end
 
+    def nud_unknown(stream)
+      raise Errors::SyntaxError, "unknown token #{stream.token.value.inspect}"
+    end
+
     def led_comparator(stream, left)
       token = stream.token
       stream.next
