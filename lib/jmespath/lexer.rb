@@ -243,7 +243,7 @@ module JMESPath
           token = inside(chars, '"', T_QUOTED_IDENTIFIER)
           if token.type == T_QUOTED_IDENTIFIER
             token.value = "\"#{token.value}\""
-            token = parse_json(token)
+            token = parse_json(token, true)
           end
           tokens << token
         when STATE_EQ
@@ -296,18 +296,30 @@ module JMESPath
     end
 
     if RUBY_VERSION.match(Regexp.escape('1.9.3'))
-      def parse_json(token)
+      def parse_json(token, quoted = false)
         begin
-          token.value = JSON.load("{\"value\":#{token.value}}")['value']
+          if quoted
+            token.value = JSON.load("{\"value\":#{token.value}}")['value']
+          else
+            begin
+              token.value = JSON.load("{\"value\":#{token.value}}")['value']
+            rescue
+              token.value = JSON.load(sprintf('{"value":"%s"}', token.value.lstrip))['value']
+            end
+          end
         rescue JSON::ParserError
           token.type = T_UNKNOWN
         end
         token
       end
     else
-      def parse_json(token)
+      def parse_json(token, quoted = false)
         begin
-          token.value = JSON.load(token.value)
+          if quoted
+            token.value = JSON.load(token.value)
+          else
+            token.value = JSON.load(token.value) rescue JSON.load(sprintf('"%s"', token.value.lstrip))
+          end
         rescue JSON::ParserError
           token.type = T_UNKNOWN
         end

@@ -7,7 +7,7 @@ end
 require 'jmespath'
 
 describe 'Compliance' do
-  Dir.glob('spec/compliance/*.json').each do |path|
+  Dir.glob('spec/{compliance,legacy}/*.json').each do |path|
 
     test_file = File.basename(path).split('.').first
     next if test_file == 'benchmarks'
