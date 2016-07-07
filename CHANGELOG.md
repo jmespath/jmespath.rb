@@ -1,4 +1,4 @@
-Unreleased Changes
+1.3.0 (2016-07-07)
 ------------------
 
 * Restored support for legacy unquoted string literals.
