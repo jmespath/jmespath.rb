@@ -1,4 +1,4 @@
-Unreleased Changes
+1.3.1 (2016-07-18)
 ------------------
 
 * Bug fix for users that have a 2.0.1+ version of the `json_pure` gem loaded
