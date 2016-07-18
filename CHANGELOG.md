@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+* Bug fix for users that have a 2.0.1+ version of the `json_pure` gem loaded
+  in their environment prior to requiring `jmespath`.
+
 1.3.0 (2016-07-07)
 ------------------
 
