@@ -15,7 +15,10 @@ rvm:
 - jruby
 
 gemfile:
-- Gemfile
+  - gemfiles/no-deps.gemfile
+  - gemfiles/json-latest.gemfile
+  - gemfiles/json-old.gemfile
+  - gemfiles/json-pure.gemfile
 
 notifications:
   webhooks:

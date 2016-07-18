@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+
+gem 'rake', require: false
+gem 'rspec', '~> 3.0'
+gem 'json', '< 2.0'
