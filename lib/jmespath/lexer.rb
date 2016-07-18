@@ -295,7 +295,40 @@ module JMESPath
       Token.new(type, buffer.join, position)
     end
 
-    if RUBY_VERSION.match(Regexp.escape('1.9.3'))
+    # Certain versions of Ruby and of the pure_json gem not support loading
+    # scalar JSON values, such a numbers, booleans, strings, etc. These
+    # simple values must be first wrapped inside a JSON object before calling
+    # `JSON.load`.
+    #
+    #    # works in most JSON versions, raises in some versions
+    #    JSON.load("true")
+    #    JSON.load("123")
+    #    JSON.load("\"abc\"")
+    #
+    # This is an known issue for:
+    #
+    # * Ruby 1.9.3 bundled v1.5.5 of json; Ruby 1.9.3 defaults to bundled
+    #   version despite newer versions being available.
+    #
+    # * json_pure v2.0.0+
+    #
+    # It is not possible to change the version of JSON loaded in the
+    # user's application. Adding an explicit dependency on json gem
+    # causes issues in environments that cannot compile the gem. We previously
+    # had a direct dependency on `json_pure`, but this broke with the v2 update.
+    #
+    # This method allows us to detect how the `JSON.load` behaves so we know
+    # if we have to wrap scalar JSON values to parse them or not.
+    # @api private
+    def self.requires_wrapping?
+      begin
+        JSON.load('false')
+      rescue JSON::ParserError
+        true
+      end
+    end
+
+    if requires_wrapping?
       def parse_json(token, quoted = false)
         begin
           if quoted

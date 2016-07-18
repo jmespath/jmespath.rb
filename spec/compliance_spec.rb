@@ -1,10 +1,4 @@
-require 'rspec'
-begin
-  require 'simplecov'
-  SimpleCov.command_name('test:compliance')
-rescue LoadError
-end
-require 'jmespath'
+require 'spec_helper'
 
 describe 'Compliance' do
   Dir.glob('spec/{compliance,legacy}/*.json').each do |path|
