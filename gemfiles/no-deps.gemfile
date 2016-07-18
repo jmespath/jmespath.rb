@@ -1,11 +1,6 @@
 source 'https://rubygems.org'
 
-# Intentionally not adding simplecov to this Gemfile. Simplecov has a direct
-# dependency on the `json` gem. This interferes with running the tests
-# using against the `json_pure` gem. There have been test failures related
-# to json_pure regressions and so we need to ensure we are testing this
-# directly.
-
 gem 'rake', require: false
 gem 'rspec', '~> 3.0'
-gem 'simplecov'
+
+# no dependency on `json` gem
