@@ -1,8 +1,7 @@
-require 'jmespath'
-
 desc 'Runs the benchmark suite'
 task 'benchmark' do
 
+  require 'jmespath'
   require 'absolute_time'
 
   runtime = JMESPath::Runtime.new(cache_expressions: !!ENV['CACHE'])

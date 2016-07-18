@@ -1,11 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake', require: false
-
-group :test do
-  gem 'rspec', '~> 3.0'
-  gem 'simplecov' unless RUBY_VERSION == '1.9.3'
-end
+gem 'rspec', '~> 3.0'
 
 group :docs do
   gem 'yard'

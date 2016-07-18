@@ -1,6 +1,6 @@
 /Gemfile.lock
+/gemfiles/*.gemfile.lock
 /docs
 /docs.zip
 /.yardoc
 /jmespath-*.gem
-/coverage
