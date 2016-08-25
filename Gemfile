@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rake', require: false
-gem 'rspec', '~> 3.0'
+gemspec
 
 group :docs do
   gem 'yard'
@@ -15,4 +14,9 @@ end
 
 group :benchmark do
   gem 'absolute_time'
+end
+
+group :test do
+  gem 'rake', require: false
+  gem 'rspec', '~> 3.0'
 end

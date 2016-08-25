@@ -4,3 +4,12 @@
 /docs.zip
 /.yardoc
 /jmespath-*.gem
+/.bundle
+/.mvn
+/.ruby-version
+/vendor
+/ext/target
+/lib/jmespath/ext
+/tmp
+/pkg
+/coverage

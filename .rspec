@@ -1,0 +1,5 @@
+--color
+--format doc
+-Ilib
+-rspec_helper
+spec
