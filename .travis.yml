@@ -1,14 +1,17 @@
+language: ruby
+
 script: bundle exec rake
 
 bundler_args: --without docs release benchmark
 
 rvm:
-- 1.9.3
-- 2.0.0
-- 2.1
-- 2.2
-- 2.3.1
-- jruby
+  - 1.9.3
+  - 2.0.0
+  - 2.1
+  - 2.2
+  - 2.3.1
+  - jruby-19mode
+  - jruby-9.1.2.0
 
 gemfile:
   - gemfiles/no-deps.gemfile
@@ -21,6 +24,11 @@ matrix:
     # latest version of `json` gem, 2.0+, is not supported on Ruby 1.9.3
     - rvm: 1.9.3
       gemfile: gemfiles/json-latest.gemfile
+
+cache:
+  bundler: true
+  directories:
+    - $HOME/.m2
 
 notifications:
   webhooks:

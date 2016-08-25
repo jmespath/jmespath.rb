@@ -2,7 +2,7 @@ if defined? JRUBY_VERSION
   namespace :extension do
     task :package do
       Dir.chdir('ext') do
-        sh 'mvn package'
+        sh "mvn -Djruby.version=#{JRUBY_VERSION} package"
       end
     end
 
