@@ -1,6 +1,8 @@
 --title 'jmespath.rb'
+--no-private
 --output-dir docs
 --markup markdown
 --markup-provider rdiscount
 --hide-api private
 --plugin sitemap
+-- README.md

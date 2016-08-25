@@ -9,5 +9,5 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'http://github.com/jmespath/jmespath.rb'
   spec.license       = 'Apache 2.0'
   spec.require_paths = ['lib']
-  spec.files         = Dir['lib/**/*.rb', 'lib/**/*.jar', 'README.md', 'LICENSE.txt', 'VERSION']
+  spec.files         = Dir['lib/**/*.rb', 'lib/**/*.jar', '.yardopts', 'README.md', 'LICENSE.txt', 'VERSION']
 end
