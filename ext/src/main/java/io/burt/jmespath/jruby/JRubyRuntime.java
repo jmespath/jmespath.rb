@@ -204,47 +204,17 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
           return value1.isTrue() == value2.isTrue() ? 0 : -1;
         case NUMBER:
         case STRING:
+        case ARRAY:
           RubyObject o1 = (RubyObject) value1;
           RubyObject o2 = (RubyObject) value2;
           return o1.compareTo(o2);
-        case ARRAY:
-          return deepEqualsArray(value1, value2) ? 0 : -1;
         case OBJECT:
-          return deepEqualsObject(value1, value2) ? 0 : -1;
+          return value1.op_equal(ruby.getCurrentContext(), value2).isTrue() ? 0 : -1;
         default:
           throw new IllegalStateException(String.format("Unknown node type encountered: %s", value1.getClass().getName()));
       }
     } else {
       return -1;
     }
-  }
-
-  private boolean deepEqualsArray(IRubyObject value1, IRubyObject value2) {
-    List<IRubyObject> values1 = toList(value1);
-    List<IRubyObject> values2 = toList(value2);
-    int size = values1.size();
-    if (size != values2.size()) {
-      return false;
-    }
-    for (int i = 0; i < size; i++) {
-      if (compare(values1.get(i), values2.get(i)) != 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private boolean deepEqualsObject(IRubyObject value1, IRubyObject value2) {
-    Collection<IRubyObject> keys1 = getPropertyNames(value1);
-    Collection<IRubyObject> keys2 = getPropertyNames(value2);
-    if (!keys1.containsAll(keys2) || !keys2.containsAll(keys1)) {
-      return false;
-    }
-    for (IRubyObject key : keys1) {
-      if (compare(getProperty(value1, key), getProperty(value2, key)) != 0) {
-        return false;
-      }
-    }
-    return true;
   }
 }
