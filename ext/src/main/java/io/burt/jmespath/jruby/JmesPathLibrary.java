@@ -19,7 +19,17 @@ import org.jruby.internal.runtime.methods.DynamicMethod;
 
 public class JmesPathLibrary implements Library {
   public void load(Ruby ruby, boolean wrap) {
-    JmesPath.install(ruby);
-    JmesPathExpression.install(ruby);
+    RubyClass jmesPathClass = JmesPath.install(ruby);
+    JmesPathExpression.install(ruby, jmesPathClass);
+    installErrors(ruby, jmesPathClass);
+  }
+
+  private void installErrors(Ruby ruby, RubyModule parentModule) {
+    RubyClass standardErrorClass = ruby.getStandardError();
+    RubyClass jmesPathError = parentModule.defineClassUnder("JMESPathError", standardErrorClass, standardErrorClass.getAllocator());
+    parentModule.defineClassUnder("ParseError", jmesPathError, jmesPathError.getAllocator());
+    RubyClass functionCallError = parentModule.defineClassUnder("FunctionCallError", jmesPathError, jmesPathError.getAllocator());
+    parentModule.defineClassUnder("ArityError", functionCallError, functionCallError.getAllocator());
+    parentModule.defineClassUnder("ArgumentTypeError", functionCallError, functionCallError.getAllocator());
   }
 }

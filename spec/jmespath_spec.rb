@@ -11,18 +11,63 @@ if defined? JRUBY_VERSION
         expression = jmespath.compile('foo.bar')
         expect(expression).to_not be_nil
       end
+
+      context 'when there is a syntax error' do
+        it 'raises an error' do
+          expect { jmespath.compile('%') }.to raise_error(JMESPath::ParseError)
+        end
+      end
+
+      context 'when the expression refers to a function that does not exist' do
+        it 'raises an error' do
+          expect { jmespath.compile('%') }.to raise_error(JMESPath::ParseError)
+        end
+      end
+
+      context 'when the expression uses an invalid value' do
+        it 'raises an error' do
+          expect { jmespath.compile('%') }.to raise_error(JMESPath::ParseError)
+        end
+      end
     end
   end
 
   describe JMESPath::Expression do
     let :expression do
-      JMESPath.new.compile('foo.bar')
+      JMESPath.new.compile(expression_str)
+    end
+
+    let :expression_str do
+      'foo.bar'
     end
 
     describe '#search' do
+      let :input do
+        {'foo' => {'bar' => 42}}
+      end
+
       it 'searches the given input and returns the result' do
-        input = {'foo' => {'bar' => 42}}
         expect(expression.search(input)).to eq(42)
+      end
+
+      context 'when a function is given the wrong number of arguments' do
+        let :expression_str do
+          'to_number(foo, bar)'
+        end
+
+        it 'raises an error' do
+          expect { expression.search(input) }.to raise_error(JMESPath::ArityError)
+        end
+      end
+
+      context 'when a function is given the wrong kind of argument' do
+        let :expression_str do
+          'max(@)'
+        end
+
+        it 'raises an error' do
+          expect { expression.search(input) }.to raise_error(JMESPath::ArgumentTypeError)
+        end
       end
     end
   end
