@@ -128,6 +128,7 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
   }
 
   @Override
+  @Deprecated
   public IRubyObject getProperty(IRubyObject value, String name) {
     return getProperty(value, ruby.newString(name));
   }
