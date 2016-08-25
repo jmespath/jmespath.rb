@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.jruby.Ruby;
+import org.jruby.RubyObject;
 import org.jruby.RubyModule;
 import org.jruby.RubyString;
 import org.jruby.RubyBoolean;
@@ -14,6 +15,7 @@ import org.jruby.RubyNumeric;
 import org.jruby.RubyInteger;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
+import org.jruby.runtime.ClassIndex;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import io.burt.jmespath.BaseRuntime;
@@ -39,10 +41,11 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
   @Override
   @SuppressWarnings("unchecked")
   public List<IRubyObject> toList(IRubyObject value) {
-    if (value instanceof RubyArray) {
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    if (nativeTypeIndex == ClassIndex.ARRAY) {
       RubyArray array = (RubyArray) value;
       return (List<IRubyObject>) array.getList();
-    } else if (value instanceof RubyHash) {
+    } else if (nativeTypeIndex == ClassIndex.HASH) {
       RubyHash hash = (RubyHash) value;
       return (List<IRubyObject>) hash.rb_values().getList();
     } else {
@@ -52,7 +55,8 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
 
   @Override
   public String toString(IRubyObject value) {
-    if (value instanceof RubyString) {
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    if (nativeTypeIndex == ClassIndex.STRING) {
       return value.asJavaString();
     } else {
       return json().callMethod(ruby.getCurrentContext(), "dump", value).toString();
@@ -61,49 +65,63 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
 
   @Override
   public Number toNumber(IRubyObject value) {
-    if (value instanceof RubyInteger) {
-      return ((RubyInteger) value).getLongValue();
-    } else if (value instanceof RubyNumeric) {
-      return ((RubyNumeric) value).getDoubleValue();
-    } else {
-      return null;
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    switch (nativeTypeIndex) {
+      case ClassIndex.FIXNUM:
+      case ClassIndex.INTEGER:
+        return ((RubyNumeric) value).getLongValue();
+      case ClassIndex.FLOAT:
+      case ClassIndex.NUMERIC:
+        return ((RubyNumeric) value).getDoubleValue();
+      default:
+        return null;
     }
   }
 
   @Override
   public JmesPathType typeOf(IRubyObject value) {
-    if (value != null && value.isNil()) {
-      return JmesPathType.NULL;
-    } else if (value instanceof RubyString) {
-      return JmesPathType.STRING;
-    } else if (value instanceof RubyNumeric) {
-      return JmesPathType.NUMBER;
-    } else if (value instanceof RubyBoolean) {
-      return JmesPathType.BOOLEAN;
-    } else if (value instanceof RubyArray) {
-      return JmesPathType.ARRAY;
-    } else if (value instanceof RubyHash) {
-      return JmesPathType.OBJECT;
-    } else {
-      throw new IllegalStateException(String.format("Unknown node type encountered: %s", value.getClass().getName()));
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    switch (nativeTypeIndex) {
+      case ClassIndex.NIL:
+        return JmesPathType.NULL;
+      case ClassIndex.TRUE:
+      case ClassIndex.FALSE:
+        return JmesPathType.BOOLEAN;
+      case ClassIndex.FIXNUM:
+      case ClassIndex.FLOAT:
+      case ClassIndex.INTEGER:
+      case ClassIndex.NUMERIC:
+        return JmesPathType.NUMBER;
+      case ClassIndex.STRING:
+        return JmesPathType.STRING;
+      case ClassIndex.ARRAY:
+        return JmesPathType.ARRAY;
+      case ClassIndex.HASH:
+        return JmesPathType.OBJECT;
+      default:
+        throw new IllegalStateException(String.format("Unknown node type encountered: %s", value.getClass().getName()));
     }
   }
 
   @Override
   public boolean isTruthy(IRubyObject value) {
-    switch (typeOf(value)) {
-      case NULL:
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    switch (nativeTypeIndex) {
+      case ClassIndex.NIL:
+      case ClassIndex.FALSE:
         return false;
-      case NUMBER:
+      case ClassIndex.FIXNUM:
+      case ClassIndex.FLOAT:
+      case ClassIndex.INTEGER:
+      case ClassIndex.NUMERIC:
+      case ClassIndex.TRUE:
         return true;
-      case BOOLEAN:
-        return value.isTrue();
-      case ARRAY:
-        return !((RubyArray) value).isEmpty();
-      case OBJECT:
-        return !((RubyHash) value).isEmpty();
-      case STRING:
+      case ClassIndex.STRING:
         return !((RubyString) value).isEmpty();
+      case ClassIndex.ARRAY:
+        return !((RubyArray) value).isEmpty();
+      case ClassIndex.HASH:
+        return !((RubyHash) value).isEmpty();
       default:
         throw new IllegalStateException(String.format("Unknown node type encountered: %s", value.getClass().getName()));
     }
@@ -116,7 +134,8 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
 
   @Override
   public IRubyObject getProperty(IRubyObject value, IRubyObject name) {
-    if (value instanceof RubyHash) {
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    if (nativeTypeIndex == ClassIndex.HASH) {
       IRubyObject result = ((RubyHash) value).fastARef(name);
       return result == null ? ruby.getNil() : result;
     } else {
@@ -127,7 +146,8 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
   @Override
   @SuppressWarnings("unchecked")
   public Collection<IRubyObject> getPropertyNames(IRubyObject value) {
-    if (value instanceof RubyHash) {
+    int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
+    if (nativeTypeIndex == ClassIndex.HASH) {
       RubyHash hash = (RubyHash) value;
       return (Collection<IRubyObject>) hash.keys().getList();
     } else {
@@ -170,5 +190,61 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
   @Override
   public IRubyObject createNumber(long n) {
     return ruby.newFixnum(n);
+  }
+
+  @Override
+  public int compare(IRubyObject value1, IRubyObject value2) {
+    JmesPathType type1 = typeOf(value1);
+    JmesPathType type2 = typeOf(value2);
+    if (type1 == type2) {
+      switch (type1) {
+        case NULL:
+          return 0;
+        case BOOLEAN:
+          return value1.isTrue() == value2.isTrue() ? 0 : -1;
+        case NUMBER:
+        case STRING:
+          RubyObject o1 = (RubyObject) value1;
+          RubyObject o2 = (RubyObject) value2;
+          return o1.compareTo(o2);
+        case ARRAY:
+          return deepEqualsArray(value1, value2) ? 0 : -1;
+        case OBJECT:
+          return deepEqualsObject(value1, value2) ? 0 : -1;
+        default:
+          throw new IllegalStateException(String.format("Unknown node type encountered: %s", value1.getClass().getName()));
+      }
+    } else {
+      return -1;
+    }
+  }
+
+  private boolean deepEqualsArray(IRubyObject value1, IRubyObject value2) {
+    List<IRubyObject> values1 = toList(value1);
+    List<IRubyObject> values2 = toList(value2);
+    int size = values1.size();
+    if (size != values2.size()) {
+      return false;
+    }
+    for (int i = 0; i < size; i++) {
+      if (compare(values1.get(i), values2.get(i)) != 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean deepEqualsObject(IRubyObject value1, IRubyObject value2) {
+    Collection<IRubyObject> keys1 = getPropertyNames(value1);
+    Collection<IRubyObject> keys2 = getPropertyNames(value2);
+    if (!keys1.containsAll(keys2) || !keys2.containsAll(keys1)) {
+      return false;
+    }
+    for (IRubyObject key : keys1) {
+      if (compare(getProperty(value1, key), getProperty(value2, key)) != 0) {
+        return false;
+      }
+    }
+    return true;
   }
 }
