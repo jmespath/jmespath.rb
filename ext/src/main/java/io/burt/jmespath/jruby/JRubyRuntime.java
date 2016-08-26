@@ -128,12 +128,6 @@ public class JRubyRuntime extends BaseRuntime<IRubyObject> {
   }
 
   @Override
-  @Deprecated
-  public IRubyObject getProperty(IRubyObject value, String name) {
-    return getProperty(value, ruby.newString(name));
-  }
-
-  @Override
   public IRubyObject getProperty(IRubyObject value, IRubyObject name) {
     int nativeTypeIndex = ((RubyObject) value).getNativeTypeIndex();
     if (nativeTypeIndex == ClassIndex.HASH) {
