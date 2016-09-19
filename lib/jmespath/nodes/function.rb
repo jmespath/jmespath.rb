@@ -207,7 +207,7 @@ module JMESPath
           return maybe_raise Errors::InvalidTypeError, "function map() expects the second argument to be an list"
         end
         list.map { |value| expr.eval(value) }
-    end
+      end
 
     end
 
