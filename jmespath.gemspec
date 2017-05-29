@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.author        = 'Trevor Rowe'
   spec.email         = 'trevorrowe@gmail.com'
   spec.homepage      = 'http://github.com/trevorrowe/jmespath.rb'
-  spec.license       = 'Apache 2.0'
+  spec.license       = 'Apache-2.0'
   spec.require_paths = ['lib']
   spec.files         = Dir['lib/**/*.rb'] + ['LICENSE.txt']
 end
