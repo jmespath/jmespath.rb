@@ -1,6 +1,18 @@
 Unreleased Changes
 ------------------
 
+* Fix typo of a license name in gemspec.
+
+  [See related GitHub pull request #41](https://github.com/jmespath/jmespath.rb/pull/41)
+
+* Test against Ruby 2.4 in Travis.
+
+  [See related GitHub pull requests #42](https://github.com/jmespath/jmespath.rb/pull/42)
+
+* Add support for floating point comparisons.
+
+  [See related GitHub pull requests #43](https://github.com/jmespath/jmespath.rb/pull/43)
+
 1.3.1 (2016-07-18)
 ------------------
 
