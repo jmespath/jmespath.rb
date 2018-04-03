@@ -34,5 +34,24 @@ module JMESPath
       expect(JMESPath.search('`1` < `2`', {})).to be(true)
     end
 
+    context 'boolean comparison' do
+      it 'supports floating point numbers' do
+        expect(JMESPath.search('`1.0` == `1.0`', {})).to be true
+        expect(JMESPath.search('`2.0` != `1.0`', {})).to be true
+        expect(JMESPath.search('`2.0` > `1.0`', {})).to be true
+        expect(JMESPath.search('`1.0` < `2.0`', {})).to be true
+        expect(JMESPath.search('`2.0` >= `1.0`', {})).to be true
+        expect(JMESPath.search('`1.0` <= `2.0`', {})).to be true
+        expect(JMESPath.search('`1.0` <= `1.0`', {})).to be true
+        expect(JMESPath.search('`1.0` >= `1.0`', {})).to be true
+
+        expect(JMESPath.search('`2.0` == `1.0`', {})).to be false
+        expect(JMESPath.search('`1.0` != `1.0`', {})).to be false
+        expect(JMESPath.search('`1.0` > `1.0`', {})).to be false
+        expect(JMESPath.search('`2.0` < `2.0`', {})).to be false
+        expect(JMESPath.search('`1.0` >= `2.0`', {})).to be false
+        expect(JMESPath.search('`2.0` <= `1.0`', {})).to be false
+      end
+    end
   end
 end
