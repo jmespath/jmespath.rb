@@ -107,6 +107,7 @@ module JMESPath
           return maybe_raise Errors::InvalidArityError, "function avg() expects one argument"
         end
         if Array === values
+          return nil if values.empty?
           values.inject(0) do |total,n|
             if Numeric === n
               total + n

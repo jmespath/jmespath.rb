@@ -59,7 +59,7 @@ module JMESPath
     # @param [Integer] rbp Right binding power
     def expr(stream, rbp = 0)
       left = send("nud_#{stream.token.type}", stream)
-      while rbp < stream.token.binding_power
+      while rbp < (stream.token.binding_power || 0)
         left = send("led_#{stream.token.type}", stream, left)
       end
       left

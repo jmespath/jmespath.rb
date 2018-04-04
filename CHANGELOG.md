@@ -1,6 +1,10 @@
 Unreleased Changes
 ------------------
 
+* Update the bundled compliance tests. Fix the 6 failing test cases that result
+  from updating the test suite. Test failures included parsing errors and
+  returning nil when comparing non-nil values.
+
 * Fix typo of a license name in gemspec.
 
   [See related GitHub pull request #41](https://github.com/jmespath/jmespath.rb/pull/41)

@@ -32,27 +32,36 @@
             }
           }
         }
+      },
+      "b": true,
+      "c": {
+        "d": true
       }
     },
     "cases": [
       {
         "comment": "simple field",
-        "expression": "a",
+        "expression": "b",
         "bench": "full"
       },
       {
         "comment": "simple subexpression",
-        "expression": "a.b",
+        "expression": "c.d",
         "bench": "full"
       },
       {
-        "comment": "deep field selection",
+        "comment": "deep field selection no match",
         "expression": "a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s",
         "bench": "full"
       },
       {
+        "comment": "deep field selection",
+        "expression": "a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p",
+        "bench": "full"
+      },
+      {
         "comment": "simple or",
-        "expression": "not_there || a",
+        "expression": "not_there || b",
         "bench": "full"
       }
     ]
@@ -76,7 +85,12 @@
       },
       {
         "comment": "lots of summing",
-        "expression": "sum(z, y, x, w, v, u, t, s, r, q, p, o, n, m, l, k, j, i, h, g, f, e, d, c, b, a)",
+        "expression": "sum([z, y, x, w, v, u, t, s, r, q, p, o, n, m, l, k, j, i, h, g, f, e, d, c, b, a])",
+        "bench": "full"
+      },
+      {
+        "comment": "lots of function application",
+        "expression": "sum([z, sum([y, sum([x, sum([w, sum([v, sum([u, sum([t, sum([s, sum([r, sum([q, sum([p, sum([o, sum([n, sum([m, sum([l, sum([k, sum([j, sum([i, sum([h, sum([g, sum([f, sum([e, sum([d, sum([c, sum([b, a])])])])])])])])])])])])])])])])])])])])])])])])])",
         "bench": "full"
       },
       {
@@ -116,7 +130,7 @@
       },
       {
         "comment": "filter projection",
-        "expression": "foo[bar > baz][qux > baz]",
+        "expression": "foo[?bar > baz][?qux > baz]",
         "bench": "parse"
       }
     ]

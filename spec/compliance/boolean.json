@@ -206,8 +206,8 @@
       "one": 1,
       "two": 2,
       "three": 3,
-      "one_dot_zero": 1.0,
-      "two_dot_zero": 2.0
+      "emptylist": [],
+      "boolvalue": false
     },
     "cases": [
       {
@@ -239,6 +239,22 @@
         "result": true
       },
       {
+        "expression": "emptylist < one",
+        "result": null
+      },
+      {
+        "expression": "emptylist < nullvalue",
+        "result": null
+      },
+      {
+        "expression": "emptylist < boolvalue",
+        "result": null
+      },
+      {
+        "expression": "one < boolvalue",
+        "result": null
+      },
+      {
         "expression": "one < two && three > one",
         "result": true
       },
@@ -253,34 +269,6 @@
       {
         "expression": "two < one || three < one",
         "result": false
-      },
-      {
-        "expression": "one_dot_zero < two_dot_zero",
-        "result": true
-      },
-      {
-        "expression": "two_dot_zero > one_dot_zero",
-        "result": true
-      },
-      {
-        "expression": "one_dot_zero <= one_dot_zero",
-        "result": true
-      },
-      {
-        "expression": "one_dot_zero >= one_dot_zero",
-        "result": true
-      },
-      {
-        "expression": "one_dot_zero == two_dot_zero",
-        "result": false
-      },
-      {
-        "expression": "one_dot_zero != two_dot_zero",
-        "result": true
-      },
-      {
-        "expression": "one_dot_zero == one_dot_zero",
-        "result": true
       }
     ]
   }

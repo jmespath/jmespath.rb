@@ -54,25 +54,41 @@ module JMESPath
 
       class Gt < Comparator
         def check(left_value, right_value)
-          left_value.is_a?(Numeric) && right_value.is_a?(Numeric) && left_value > right_value
+          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+            left_value > right_value
+          else
+            nil
+          end
         end
       end
 
       class Gte < Comparator
         def check(left_value, right_value)
-          left_value.is_a?(Numeric) && right_value.is_a?(Numeric) && left_value >= right_value
+          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+            left_value >= right_value
+          else
+            nil
+          end
         end
       end
 
       class Lt < Comparator
         def check(left_value, right_value)
-          left_value.is_a?(Numeric) && right_value.is_a?(Numeric) && left_value < right_value
+          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+            left_value < right_value
+          else
+            nil
+          end
         end
       end
 
       class Lte < Comparator
         def check(left_value, right_value)
-          left_value.is_a?(Numeric) && right_value.is_a?(Numeric) && left_value <= right_value
+          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+            left_value <= right_value
+          else
+            nil
+          end
         end
       end
     end
