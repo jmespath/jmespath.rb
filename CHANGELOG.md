@@ -1,4 +1,4 @@
-Unreleased Changes
+1.4.0 (2018-04-04)
 ------------------
 
 * Update the bundled compliance tests. Fix the 6 failing test cases that result
