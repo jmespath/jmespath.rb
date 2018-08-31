@@ -81,6 +81,33 @@
     ]
   },
   {
+    "given": {"foo": [{"length": 170},
+      {"length": 175.5},
+      {"length": 185}]},
+    "cases": [
+      {
+        "comment": "Less than number",
+        "expression": "foo[?length < `180`]",
+        "result": [{"length": 170}, {"length": 175.5}]
+      },
+      {
+        "comment": "Less than or equal to number",
+        "expression": "foo[?length <= `175.5`]",
+        "result": [{"length": 170}, {"length": 175.5}]
+      },
+      {
+        "comment": "Greater than number",
+        "expression": "foo[?length > `170`]",
+        "result": [{"length": 175.5}, {"length": 185}]
+      },
+      {
+        "comment": "Greater than or equal to number",
+        "expression": "foo[?length >= `175.5`]",
+        "result": [{"length": 175.5}, {"length": 185}]
+      }
+    ]
+  },
+  {
     "given": {"foo": [{"top": {"name": "a"}},
       {"top": {"name": "b"}}]},
     "cases": [
