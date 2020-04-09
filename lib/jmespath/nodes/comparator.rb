@@ -2,6 +2,8 @@ module JMESPath
   # @api private
   module Nodes
     class Comparator < Node
+      COMPARABLE_TYPES = [Numeric, String].freeze
+
       attr_reader :left, :right
 
       def initialize(left, right)
@@ -36,6 +38,12 @@ module JMESPath
       def check(left_value, right_value)
         nil
       end
+
+      def comparable?(left_value, right_value)
+        COMPARABLE_TYPES.any? do |type|
+          left_value.is_a?(type) && right_value.is_a?(type)
+        end
+      end
     end
 
     module Comparators
@@ -54,7 +62,7 @@ module JMESPath
 
       class Gt < Comparator
         def check(left_value, right_value)
-          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+          if comparable?(left_value, right_value)
             left_value > right_value
           else
             nil
@@ -64,7 +72,8 @@ module JMESPath
 
       class Gte < Comparator
         def check(left_value, right_value)
-          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+          # raise "#{left_value} <-> #{right_value}"
+          if comparable?(left_value, right_value)
             left_value >= right_value
           else
             nil
@@ -74,7 +83,7 @@ module JMESPath
 
       class Lt < Comparator
         def check(left_value, right_value)
-          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+          if comparable?(left_value, right_value)
             left_value < right_value
           else
             nil
@@ -84,7 +93,7 @@ module JMESPath
 
       class Lte < Comparator
         def check(left_value, right_value)
-          if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+          if comparable?(left_value, right_value)
             left_value <= right_value
           else
             nil

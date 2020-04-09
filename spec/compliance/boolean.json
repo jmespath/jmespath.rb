@@ -269,6 +269,14 @@
       {
         "expression": "two < one || three < one",
         "result": false
+      },
+      {
+        "expression": "'2010-02-01' > '2011-05-01'",
+        "result": false
+      },
+      {
+        "expression": "'2010-02-01' <= '2011-05-01'",
+        "result": true
       }
     ]
   }
