@@ -50,14 +50,20 @@ module JMESPath
 
     module TypeChecker
       def get_type(value)
-        case value
-        when String then STRING_TYPE
-        when true, false then BOOLEAN_TYPE
-        when nil then NULL_TYPE
-        when Numeric then NUMBER_TYPE
-        when Hash, Struct then OBJECT_TYPE
-        when Array then ARRAY_TYPE
-        when Expression then EXPRESSION_TYPE
+        if value.respond_to?(:to_str)
+          STRING_TYPE
+        elsif value == true || value == false
+          BOOLEAN_TYPE
+        elsif value == nil
+          NULL_TYPE
+        elsif value.is_a?(Numeric)
+          NUMBER_TYPE
+        elsif value.respond_to?(:to_hash) || value.is_a?(Struct)
+          OBJECT_TYPE
+        elsif value.respond_to?(:to_ary)
+          ARRAY_TYPE
+        elsif value.is_a?(Expression)
+          EXPRESSION_TYPE
         end
       end
 
@@ -106,7 +112,8 @@ module JMESPath
         else
           return maybe_raise Errors::InvalidArityError, "function avg() expects one argument"
         end
-        if Array === values
+        if values.respond_to?(:to_ary)
+          values = values.to_ary
           return nil if values.empty?
           values.inject(0) do |total,n|
             if Numeric === n
@@ -145,8 +152,10 @@ module JMESPath
         if args.count == 2
           haystack = args[0]
           needle = args[1]
-          if String === haystack || Array === haystack
-            haystack.include?(needle)
+          if haystack.respond_to?(:to_str)
+            haystack.to_str.include?(needle)
+          elsif haystack.respond_to?(:to_ary)
+            haystack.to_ary.include?(needle)
           else
             return maybe_raise Errors::InvalidTypeError, "contains expects 2nd arg to be a list"
           end
@@ -182,9 +191,14 @@ module JMESPath
         else
           return maybe_raise Errors::InvalidArityError, "function length() expects one argument"
         end
-        case value
-        when Hash, Array, String then value.size
-        else return maybe_raise Errors::InvalidTypeError, "function length() expects string, array or object"
+        if value.respond_to?(:to_hash)
+          value.to_hash.size
+        elsif value.respond_to?(:to_ary)
+          value.to_ary.size
+        elsif value.respond_to?(:to_str)
+          value.to_str.size
+        else
+          return maybe_raise Errors::InvalidTypeError, "function length() expects string, array or object"
         end
       end
     end
@@ -202,8 +216,8 @@ module JMESPath
         else
           return maybe_raise Errors::InvalidTypeError, "function map() expects the first argument to be an expression"
         end
-        if Array === args[1]
-          list = args[1]
+        if args[1].respond_to?(:to_ary)
+          list = args[1].to_ary
         else
           return maybe_raise Errors::InvalidTypeError, "function map() expects the second argument to be an list"
         end
@@ -223,7 +237,8 @@ module JMESPath
         else
           return maybe_raise Errors::InvalidArityError, "function max() expects one argument"
         end
-        if Array === values
+        if values.respond_to?(:to_ary)
+          values = values.to_ary
           return nil if values.empty?
           first = values.first
           first_type = get_type(first)
@@ -258,7 +273,8 @@ module JMESPath
         else
           return maybe_raise Errors::InvalidArityError, "function min() expects one argument"
         end
-        if Array === values
+        if values.respond_to?(:to_ary)
+          values = values.to_ary
           return nil if values.empty?
           first = values.first
           first_type = get_type(first)
@@ -302,12 +318,10 @@ module JMESPath
       def call(args)
         if args.count == 1
           value = args.first
-          if hash_like?(value)
-            case value
-            when Hash then value.keys.map(&:to_s)
-            when Struct then value.members.map(&:to_s)
-            else raise NotImplementedError
-            end
+          if value.respond_to?(:to_hash)
+            value.to_hash.keys.map(&:to_s)
+          elsif value.is_a?(Struct)
+            value.members.map(&:to_s)
           else
             return maybe_raise Errors::InvalidTypeError, "function keys() expects a hash"
           end
@@ -323,10 +337,12 @@ module JMESPath
       def call(args)
         if args.count == 1
           value = args.first
-          if hash_like?(value)
+          if value.respond_to?(:to_hash)
+            value.to_hash.values
+          elsif value.is_a?(Struct)
             value.values
-          elsif Array === value
-            value
+          elsif value.respond_to?(:to_ary)
+            value.to_ary
           else
             return maybe_raise Errors::InvalidTypeError, "function values() expects an array or a hash"
           end
@@ -343,10 +359,10 @@ module JMESPath
         if args.count == 2
           glue = args[0]
           values = args[1]
-          if !(String === glue)
+          if !glue.respond_to?(:to_str)
             return maybe_raise Errors::InvalidTypeError, "function join() expects the first argument to be a string"
-          elsif Array === values && values.all? { |v| String === v }
-            values.join(glue)
+          elsif values.respond_to?(:to_ary) && values.to_ary.all? { |v| v.respond_to?(:to_str) }
+            values.to_ary.join(glue)
           else
             return maybe_raise Errors::InvalidTypeError, "function join() expects values to be an array of strings"
           end
@@ -362,7 +378,7 @@ module JMESPath
       def call(args)
         if args.count == 1
           value = args.first
-          String === value ? value : value.to_json
+          value.respond_to?(:to_str) ? value.to_str : value.to_json
         else
           return maybe_raise Errors::InvalidArityError, "function to_string() expects one argument"
         end
@@ -390,8 +406,8 @@ module JMESPath
       FUNCTIONS['sum'] = self
 
       def call(args)
-        if args.count == 1 && Array === args.first
-          args.first.inject(0) do |sum,n|
+        if args.count == 1 && args.first.respond_to?(:to_ary)
+          args.first.to_ary.inject(0) do |sum,n|
             if Numeric === n
               sum + n
             else
@@ -424,7 +440,8 @@ module JMESPath
       def call(args)
         if args.count == 1
           value = args.first
-          if Array === value
+          if value.respond_to?(:to_ary)
+            value = value.to_ary
             # every element in the list must be of the same type
             array_type = get_type(value[0])
             if array_type == STRING_TYPE || array_type == NUMBER_TYPE || value.size == 0
@@ -459,7 +476,7 @@ module JMESPath
       def call(args)
         if args.count == 2
           if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
-            values = args[0]
+            values = args[0].to_ary
             expression = args[1]
             array_type = get_type(expression.eval(values[0]))
             if array_type == STRING_TYPE || array_type == NUMBER_TYPE || values.size == 0
@@ -495,6 +512,7 @@ module JMESPath
           values = args[0]
           expression = args[1]
           if get_type(values) == ARRAY_TYPE && get_type(expression) == EXPRESSION_TYPE
+            values = values.to_ary
             type = get_type(expression.eval(values.first))
             if type != NUMBER_TYPE && type != STRING_TYPE
               msg = "function #{mode}() expects values to be strings or numbers"
@@ -616,8 +634,10 @@ module JMESPath
           return maybe_raise Errors::InvalidArityError, msg
         end
         value = args.first
-        if Array === value || String === value
-          value.reverse
+        if value.respond_to?(:to_ary)
+          value.to_ary.reverse
+        elsif value.respond_to?(:to_str)
+          value.to_str.reverse
         else
           msg = "function reverse() expects an array or string"
           return maybe_raise Errors::InvalidTypeError, msg
@@ -630,7 +650,7 @@ module JMESPath
 
       def call(args)
         value = args.first
-        Array === value ? value : [value]
+        value.respond_to?(:to_ary) ? value.to_ary : [value]
       end
     end
   end

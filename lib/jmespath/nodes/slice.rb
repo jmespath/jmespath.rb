@@ -10,7 +10,7 @@ module JMESPath
       end
 
       def visit(value)
-        if String === value || Array === value
+        if (value = value.respond_to?(:to_str) ? value.to_str : value.respond_to?(:to_ary) ? value.to_ary : nil)
           start, stop, step = adjust_slice(value.size, @start, @stop, @step)
           result = []
           if step > 0
@@ -26,7 +26,7 @@ module JMESPath
               i += step
             end
           end
-          String === value ? result.join : result
+          value.respond_to?(:to_str) ? result.join : result
         else
           nil
         end
@@ -80,7 +80,7 @@ module JMESPath
       end
 
       def visit(value)
-        if String === value || Array === value
+        if (value = value.respond_to?(:to_str) ? value.to_str : value.respond_to?(:to_ary) ? value.to_ary : nil)
           value[@start, @stop - @start]
         else
           nil

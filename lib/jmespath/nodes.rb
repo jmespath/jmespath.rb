@@ -5,10 +5,6 @@ module JMESPath
       def visit(value)
       end
 
-      def hash_like?(value)
-        Hash === value || Struct === value
-      end
-
       def optimize
         self
       end

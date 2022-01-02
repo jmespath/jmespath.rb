@@ -8,9 +8,10 @@ module JMESPath
       end
 
       def visit(value)
-        if value.is_a?(Array) && @key.is_a?(Integer)
-          value[@key]
-        elsif value.is_a?(Hash)
+        if value.respond_to?(:to_ary) && @key.is_a?(Integer)
+          value.to_ary[@key]
+        elsif value.respond_to?(:to_hash)
+          value = value.to_hash
           if !(v = value[@key]).nil?
             v
           elsif @key_sym && !(v = value[@key_sym]).nil?
@@ -48,9 +49,10 @@ module JMESPath
 
       def visit(obj)
         @keys.reduce(obj) do |value, key|
-          if value.is_a?(Array) && key.is_a?(Integer)
-            value[key]
-          elsif value.is_a?(Hash)
+          if value.respond_to?(:to_ary) && key.is_a?(Integer)
+            value.to_ary[key]
+          elsif value.respond_to?(:to_hash)
+            value = value.to_hash
             if !(v = value[key]).nil?
               v
             elsif (sym = @key_syms[key]) && !(v = value[sym]).nil?

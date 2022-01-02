@@ -9,7 +9,9 @@ module JMESPath
       #
       def falsey?(value)
         !value ||
-        (value.respond_to?(:empty?) && value.empty?) ||
+        (value.respond_to?(:to_ary) && value.to_ary.empty?) ||
+        (value.respond_to?(:to_hash) && value.to_hash.empty?) ||
+        (value.respond_to?(:to_str) && value.to_str.empty?) ||
         (value.respond_to?(:entries) && !value.entries.any?)
         # final case necessary to support Enumerable and Struct
       end
