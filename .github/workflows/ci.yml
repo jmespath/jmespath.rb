@@ -19,9 +19,9 @@ jobs:
         gemfile: [no-deps, json-latest, json-old, json-pure]
         exclude:
           - ruby: '3.0'
-            env: json-old
+            gemfile: json-old
           - ruby: 3.1
-            env: json-old
+            gemfile: json-old
 
     steps:
       - name: Setup Ruby
