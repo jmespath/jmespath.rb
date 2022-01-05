@@ -26,16 +26,12 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: Set bundle config
-        run: bundle config set --local without 'docs release benchmark'
-
       - name: Install gems
         run: |
-          cat .bundle/config
           bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile --without docs release benchmark
 
       - name: Unit Tests
-        run: bundle exec rake test:unit
+        run: BUNDLE_GEMFILE=gemfiles/${{ matrix.gemfile }}.gemfile bundle exec rake test:unit
 
       - name: Compliance Tests
-        run: bundle exec rake test:compliance
+        run: BUNDLE_GEMFILE=gemfiles/${{ matrix.gemfile }}.gemfile bundle exec rake test:compliance
