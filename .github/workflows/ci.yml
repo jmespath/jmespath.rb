@@ -32,7 +32,7 @@ jobs:
       - name: Install gems
         run: |
           cat .bundle/config
-          bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile
+          bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile --without docs release benchmark
 
       - name: Unit Tests
         run: bundle exec rake test:unit
