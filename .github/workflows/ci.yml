@@ -23,7 +23,7 @@ jobs:
           - ruby: 3.1
             gemfile: json-old
           - ruby: 1.9
-            gemfile: json-new
+            gemfile: json-latest
           - ruby: 1.9
             gemfile: json-pure
 
