@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [2.3, 2.4, 2.5, 2.6, 2.7, '3.0', jruby-9.1, jruby-9.2]
+        gemfile: [no-deps, json-latest, json-old, json-pure]
+
+    steps:
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+
+      - uses: actions/checkout@v2
+
+      - name: Install gems
+        run: |
+          bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile --without docs release benchmark
+
+      - name: Unit Tests
+        run: bundle exec rake test:unit
+
+      -name: Compliance Tests
+        run: bundle exec rake test:compliance
