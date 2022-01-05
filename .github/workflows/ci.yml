@@ -33,5 +33,5 @@ jobs:
       - name: Unit Tests
         run: bundle exec rake test:unit
 
-      -name: Compliance Tests
+      - name: Compliance Tests
         run: bundle exec rake test:compliance
