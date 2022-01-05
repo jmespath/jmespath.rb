@@ -1,3 +1,3 @@
 module JMESPath
-  VERSION = '1.5.0'
+  VERSION = File.read(File.expand_path('../../VERSION', __dir__)).strip
 end
