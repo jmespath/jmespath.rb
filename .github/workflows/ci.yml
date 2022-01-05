@@ -28,10 +28,10 @@ jobs:
 
       - name: Install gems
         run: |
-          bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile --without docs release benchmark
+          bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile
 
       - name: Unit Tests
-        run: bundle exec rake test:unit --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile --without docs release benchmark
+        run: bundle exec rake test:unit
 
       - name: Compliance Tests
-        run: bundle exec rake test:compliance --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile --without docs release benchmark
+        run: bundle exec rake test:compliance
