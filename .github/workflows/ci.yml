@@ -17,6 +17,11 @@ jobs:
       matrix:
         ruby: [2.3, 2.4, 2.5, 2.6, 2.7, '3.0', 3.1, jruby-9.1, jruby-9.2]
         gemfile: [no-deps, json-latest, json-old, json-pure]
+        exclude:
+          - ruby: '3.0'
+            env: json-old
+          - ruby: 3.1
+            env: json-old
 
     steps:
       - name: Setup Ruby
