@@ -28,6 +28,7 @@ jobs:
 
       - name: Install gems
         run: |
+          bundle config set --local without 'docs release benchmark'
           bundle install --gemfile=gemfiles/${{ matrix.gemfile }}.gemfile
 
       - name: Unit Tests
