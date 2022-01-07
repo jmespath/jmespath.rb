@@ -151,11 +151,11 @@ module JMESPath
       def call(args)
         if args.count == 2
           haystack = args[0]
-          needle = args[1]
+          needle = Util.as_json(args[1])
           if haystack.respond_to?(:to_str)
             haystack.to_str.include?(needle)
           elsif haystack.respond_to?(:to_ary)
-            haystack.to_ary.include?(needle)
+            haystack.to_ary.any? { |e| Util.as_json(e) == needle }
           else
             return maybe_raise Errors::InvalidTypeError, "contains expects 2nd arg to be a list"
           end

@@ -42,13 +42,13 @@ module JMESPath
 
       class Eq < Comparator
         def check(left_value, right_value)
-          left_value == right_value
+          Util.as_json(left_value) == Util.as_json(right_value)
         end
       end
 
       class Neq < Comparator
         def check(left_value, right_value)
-          left_value != right_value
+          Util.as_json(left_value) != Util.as_json(right_value)
         end
       end
 

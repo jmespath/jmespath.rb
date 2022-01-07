@@ -43,7 +43,7 @@ module JMESPath
       COMPARATOR_TO_CONDITION[Comparators::Eq] = self
 
       def visit(value)
-        @left.visit(value) == @right.visit(value) ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) == Util.as_json(@right.visit(value)) ? @child.visit(value) : nil
       end
 
       def optimize
@@ -62,7 +62,7 @@ module JMESPath
       end
 
       def visit(value)
-        @left.visit(value) == @right ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) == @right ? @child.visit(value) : nil
       end
     end
 
@@ -70,7 +70,7 @@ module JMESPath
       COMPARATOR_TO_CONDITION[Comparators::Neq] = self
 
       def visit(value)
-        @left.visit(value) != @right.visit(value) ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) != Util.as_json(@right.visit(value)) ? @child.visit(value) : nil
       end
 
       def optimize
@@ -89,7 +89,7 @@ module JMESPath
       end
 
       def visit(value)
-        @left.visit(value) != @right ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) != @right ? @child.visit(value) : nil
       end
     end
 
