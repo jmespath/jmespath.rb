@@ -207,6 +207,7 @@
       "two": 2,
       "three": 3,
       "emptylist": [],
+      "complexlist": [{}, []],
       "boolvalue": false
     },
     "cases": [
@@ -220,6 +221,22 @@
       },
       {
         "expression": "one == one",
+        "result": true
+      },
+      {
+        "expression": "emptylist == `[]`",
+        "result": true
+      },
+      {
+        "expression": "emptylist == emptylist",
+        "result": true
+      },
+      {
+        "expression": "complexlist == `[{}, []]`",
+        "result": true
+      },
+      {
+        "expression": "complexlist == complexlist",
         "result": true
       },
       {
