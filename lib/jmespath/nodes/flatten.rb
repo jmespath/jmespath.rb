@@ -8,10 +8,10 @@ module JMESPath
 
       def visit(value)
         value = @child.visit(value)
-        if Array === value
-          value.each_with_object([]) do |v, values|
-            if Array === v
-              values.concat(v)
+        if value.respond_to?(:to_ary)
+          value.to_ary.each_with_object([]) do |v, values|
+            if v.respond_to?(:to_ary)
+              values.concat(v.to_ary)
             else
               values.push(v)
             end

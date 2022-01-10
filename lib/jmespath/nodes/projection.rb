@@ -45,8 +45,8 @@ module JMESPath
 
     class ArrayProjection < Projection
       def extract_targets(target)
-        if Array === target
-          target
+        if target.respond_to?(:to_ary)
+          target.to_ary
         else
           nil
         end
@@ -63,7 +63,9 @@ module JMESPath
 
     class ObjectProjection < Projection
       def extract_targets(target)
-        if hash_like?(target)
+        if target.respond_to?(:to_hash)
+          target.to_hash.values
+        elsif target.is_a?(Struct)
           target.values
         else
           nil
