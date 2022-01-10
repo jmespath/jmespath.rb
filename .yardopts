@@ -1,5 +1,4 @@
 --title 'jmespath.rb'
---output-dir docs
 --markup markdown
 --markup-provider rdiscount
 --hide-api private

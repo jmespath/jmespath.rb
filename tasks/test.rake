@@ -15,3 +15,4 @@ RSpec::Core::RakeTask.new('test:compliance') do |t|
 end
 
 task 'test' => ['test:unit', 'test:compliance']
+task 'release:test' => :test
