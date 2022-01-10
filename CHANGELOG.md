@@ -1,6 +1,10 @@
 Unreleased Changes
 ------------------
 
+* Support implicitly convertible objects/duck-type values responding to `to_hash` and `to_ary`.
+
+  [See related GitHub pull request #51](https://github.com/jmespath/jmespath.rb/pull/51).
+
 1.4.0 (2018-04-04)
 ------------------
 
