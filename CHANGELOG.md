@@ -1,4 +1,4 @@
-Unreleased Changes
+1.5.0 (2022-01-10)
 ------------------
 
 * Support implicitly convertible objects/duck-type values responding to `to_hash` and `to_ary`.
