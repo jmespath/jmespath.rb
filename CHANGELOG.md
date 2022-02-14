@@ -1,4 +1,7 @@
-Unreleased Changes
+1.6.0 (2022-02-14)
+------------------
+
+1.6.0 (2022-02-14)
 ------------------
 
 * Feature - Add support for string comparisions.
