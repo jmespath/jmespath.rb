@@ -464,5 +464,29 @@
         "result": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
       }
     ]
+  },
+  {
+    "given": {
+      "foo": ["2010-02-01", "2011-05-01"]
+    },
+    "cases": [
+      {
+        "comment": "Greater than with ISO 8601 date string",
+        "expression": "foo[?@ > '2010-06-01']",
+        "result": ["2011-05-01"]
+      }
+    ]
+  },
+  {
+    "given": {
+      "foo": [{"date": "2010-02-01"}, {"date": "2011-05-01"}]
+    },
+    "cases": [
+      {
+        "comment": "Greater than with ISO 8601 date string",
+        "expression": "foo[?date > '2010-06-01'].date",
+        "result": ["2011-05-01"]
+      }
+    ]
   }
 ]

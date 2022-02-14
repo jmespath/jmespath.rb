@@ -27,6 +27,7 @@ module JMESPath
 
     class ComparatorCondition < Node
       COMPARATOR_TO_CONDITION = {}
+      COMPARABLE_TYPES = [Integer, String].freeze
 
       def initialize(left, right, child)
         @left = left
@@ -36,6 +37,14 @@ module JMESPath
 
       def visit(value)
         nil
+      end
+
+      private
+
+      def comparable?(left_value, right_value)
+        COMPARABLE_TYPES.any? do |type|
+          left_value.is_a?(type) && right_value.is_a?(type)
+        end
       end
     end
 
@@ -99,7 +108,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value > right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value > right_value ? @child.visit(value) : nil
       end
     end
 
@@ -109,7 +118,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value >= right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value >= right_value ? @child.visit(value) : nil
       end
     end
 
@@ -119,7 +128,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value < right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value < right_value ? @child.visit(value) : nil
       end
     end
 
@@ -129,7 +138,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value <= right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value <= right_value ? @child.visit(value) : nil
       end
     end
   end
