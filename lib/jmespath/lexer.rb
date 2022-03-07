@@ -298,12 +298,12 @@ module JMESPath
     # Certain versions of Ruby and of the pure_json gem not support loading
     # scalar JSON values, such a numbers, booleans, strings, etc. These
     # simple values must be first wrapped inside a JSON object before calling
-    # `JSON.load`.
+    # `JSON.parse`.
     #
     #    # works in most JSON versions, raises in some versions
-    #    JSON.load("true")
-    #    JSON.load("123")
-    #    JSON.load("\"abc\"")
+    #    JSON.parse("true")
+    #    JSON.parse("123")
+    #    JSON.parse("\"abc\"")
     #
     # This is an known issue for:
     #
@@ -317,12 +317,12 @@ module JMESPath
     # causes issues in environments that cannot compile the gem. We previously
     # had a direct dependency on `json_pure`, but this broke with the v2 update.
     #
-    # This method allows us to detect how the `JSON.load` behaves so we know
+    # This method allows us to detect how the `JSON.parse` behaves so we know
     # if we have to wrap scalar JSON values to parse them or not.
     # @api private
     def self.requires_wrapping?
       begin
-        JSON.load('false')
+        JSON.parse('false')
       rescue JSON::ParserError
         true
       end
@@ -332,12 +332,12 @@ module JMESPath
       def parse_json(token, quoted = false)
         begin
           if quoted
-            token.value = JSON.load("{\"value\":#{token.value}}")['value']
+            token.value = JSON.parse("{\"value\":#{token.value}}")['value']
           else
             begin
-              token.value = JSON.load("{\"value\":#{token.value}}")['value']
+              token.value = JSON.parse("{\"value\":#{token.value}}")['value']
             rescue
-              token.value = JSON.load(sprintf('{"value":"%s"}', token.value.lstrip))['value']
+              token.value = JSON.parse(sprintf('{"value":"%s"}', token.value.lstrip))['value']
             end
           end
         rescue JSON::ParserError
@@ -349,9 +349,9 @@ module JMESPath
       def parse_json(token, quoted = false)
         begin
           if quoted
-            token.value = JSON.load(token.value)
+            token.value = JSON.parse(token.value)
           else
-            token.value = JSON.load(token.value) rescue JSON.load(sprintf('"%s"', token.value.lstrip))
+            token.value = JSON.parse(token.value) rescue JSON.parse(sprintf('"%s"', token.value.lstrip))
           end
         rescue JSON::ParserError
           token.type = T_UNKNOWN
