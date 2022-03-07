@@ -1,4 +1,4 @@
-Unreleased Changes
+1.6.1 (2022-03-07)
 ------------------
 
 * Issue - Use `JSON.parse` instead of `JSON.load`.
