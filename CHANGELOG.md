@@ -1,10 +1,12 @@
-1.6.0 (2022-02-14)
+Unreleased Changes
 ------------------
+
+* Issue - Use `JSON.parse` instead of `JSON.load`.
 
 1.6.0 (2022-02-14)
 ------------------
 
-* Feature - Add support for string comparisions.
+* Feature - Add support for string comparisons.
 
 1.5.0 (2022-01-10)
 ------------------
@@ -230,4 +232,3 @@
 ------------------
 
 * Passing all of the JMESPath compliance tests.
-

@@ -26,7 +26,7 @@ module JMESPath
       data = case data
         when Hash, Struct then data # check for most common case first
         when Pathname then load_json(data)
-        when IO, StringIO then JSON.load(data.read)
+        when IO, StringIO then JSON.parse(data.read)
         else data
         end
       Runtime.new(runtime_options).search(expression, data)
@@ -34,7 +34,7 @@ module JMESPath
 
     # @api private
     def load_json(path)
-      JSON.load(File.open(path, 'r', encoding: 'UTF-8') { |f| f.read })
+      JSON.parse(File.open(path, 'r', encoding: 'UTF-8') { |f| f.read })
     end
 
   end
