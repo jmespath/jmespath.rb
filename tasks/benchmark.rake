@@ -1,17 +1,17 @@
+# frozen_string_literal: true
+
 desc 'Runs the benchmark suite'
 task 'benchmark' do
-
   require 'jmespath'
   require 'absolute_time'
 
-  runtime = JMESPath::Runtime.new(cache_expressions: !!ENV['CACHE'])
+  runtime = JMESPath::Runtime.new(cache_expressions: !ENV['CACHE'].nil?)
 
   # The benchmarks are taken from the boto/jmespath project from the
   # pref/ directory.
   Dir.glob('benchmark/*.json').each do |path|
     JMESPath.load_json(path).first.tap do |scenario|
       scenario['cases'].each do |test_case|
-
         expression = test_case['expression']
         data = scenario['given']
 
@@ -23,8 +23,7 @@ task 'benchmark' do
         end
 
         label = "#{scenario['description']} - #{test_case['name']}"
-        printf("%fms, %s\n" % [time * 1000, label])
-
+        printf(format("%fms, %s\n", time * 1000, label))
       end
     end
   end
@@ -32,5 +31,5 @@ end
 
 desc 'Runs the benchmark suite, with expression caching'
 task 'benchmark:cached' do
-  sh({"CACHE" => "1"}, "bundle exec rake benchmark")
+  sh({ 'CACHE' => '1' }, 'bundle exec rake benchmark')
 end

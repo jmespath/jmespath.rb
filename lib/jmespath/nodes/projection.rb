@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JMESPath
   # @api private
   module Nodes
@@ -12,9 +14,7 @@ module JMESPath
           list = []
           targets.each do |v|
             vv = @projection.visit(v)
-            unless vv.nil?
-              list << vv
-            end
+            list << vv unless vv.nil?
           end
           list
         end
@@ -30,7 +30,7 @@ module JMESPath
 
       private
 
-      def extract_targets(left_value)
+      def extract_targets(_left_value)
         nil
       end
     end
@@ -45,11 +45,7 @@ module JMESPath
 
     class ArrayProjection < Projection
       def extract_targets(target)
-        if target.respond_to?(:to_ary)
-          target.to_ary
-        else
-          nil
-        end
+        target.to_ary if target.respond_to?(:to_ary)
       end
 
       def fast_instance
@@ -67,8 +63,6 @@ module JMESPath
           target.to_hash.values
         elsif target.is_a?(Struct)
           target.values
-        else
-          nil
         end
       end
 

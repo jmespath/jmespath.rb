@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JMESPath
   # @api private
   module Nodes
@@ -8,7 +10,7 @@ module JMESPath
         @value = value
       end
 
-      def visit(value)
+      def visit(_value)
         @value
       end
     end
