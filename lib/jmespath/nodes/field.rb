@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   module Nodes
@@ -41,9 +42,7 @@ module JMESPath
       def initialize(keys)
         @keys = keys
         @key_syms = keys.each_with_object({}) do |k, syms|
-          if k.respond_to?(:to_sym)
-            syms[k] = k.to_sym
-          end
+          syms[k] = k.to_sym if k.respond_to?(:to_sym)
         end
       end
 
@@ -70,10 +69,7 @@ module JMESPath
 
       private
 
-      def keys
-        @keys
-      end
-
+      attr_reader :keys
     end
   end
 end

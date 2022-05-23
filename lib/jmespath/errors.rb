@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module JMESPath
   module Errors
-
     class Error < StandardError; end
 
     class RuntimeError < Error; end
@@ -14,6 +15,5 @@ module JMESPath
     class InvalidArityError < Error; end
 
     class UnknownFunctionError < Error; end
-
   end
 end

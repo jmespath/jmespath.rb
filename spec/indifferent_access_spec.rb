@@ -1,11 +1,11 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 module JMESPath
   describe '.search' do
     describe 'indifferent access' do
-
       it 'treats hashes indifferently with symbols/strings' do
-        data = {foo:{bar:{yuck:'abc'}}}
+        data = { foo: { bar: { yuck: 'abc' } } }
         expect(JMESPath.search('foo.bar.yuck', data)).to eq('abc')
       end
 
@@ -26,7 +26,6 @@ module JMESPath
         )
         expect(JMESPath.search('foo.baz.yuck', data)).to be(nil)
       end
-
     end
   end
 end
