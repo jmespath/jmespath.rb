@@ -1,29 +1,28 @@
-# frozen_string_literal: true
-
 require 'set'
 
 module JMESPath
   # @api private
   class Parser
+
     AFTER_DOT = Set.new([
-                          Lexer::T_IDENTIFIER, # foo.bar
-                          Lexer::T_QUOTED_IDENTIFIER, # foo."bar"
-                          Lexer::T_STAR,              # foo.*
-                          Lexer::T_LBRACE,            # foo{a: 0}
-                          Lexer::T_LBRACKET,          # foo[1]
-                          Lexer::T_FILTER # foo.[?bar==10]
-                        ])
+      Lexer::T_IDENTIFIER,        # foo.bar
+      Lexer::T_QUOTED_IDENTIFIER, # foo."bar"
+      Lexer::T_STAR,              # foo.*
+      Lexer::T_LBRACE,            # foo{a: 0}
+      Lexer::T_LBRACKET,          # foo[1]
+      Lexer::T_FILTER,            # foo.[?bar==10]
+    ])
 
     NUM_COLON_RBRACKET = Set.new([
-                                   Lexer::T_NUMBER,
-                                   Lexer::T_COLON,
-                                   Lexer::T_RBRACKET
-                                 ])
+      Lexer::T_NUMBER,
+      Lexer::T_COLON,
+      Lexer::T_RBRACKET,
+    ])
 
     COLON_RBRACKET = Set.new([
-                               Lexer::T_COLON,
-                               Lexer::T_RBRACKET
-                             ])
+      Lexer::T_COLON,
+      Lexer::T_RBRACKET,
+    ])
 
     CURRENT_NODE = Nodes::Current.new
 
@@ -35,7 +34,7 @@ module JMESPath
 
     # @param [String<JMESPath>] expression
     def parse(expression)
-      tokens = @lexer.tokenize(expression)
+      tokens =  @lexer.tokenize(expression)
       stream = TokenStream.new(expression, tokens)
       result = expr(stream)
       if stream.token.type != Lexer::T_EOF
@@ -60,7 +59,9 @@ module JMESPath
     # @param [Integer] rbp Right binding power
     def expr(stream, rbp = 0)
       left = send("nud_#{stream.token.type}", stream)
-      left = send("led_#{stream.token.type}", stream, left) while rbp < (stream.token.binding_power || 0)
+      while rbp < (stream.token.binding_power || 0)
+        left = send("led_#{stream.token.type}", stream, left)
+      end
       left
     end
 
@@ -82,8 +83,9 @@ module JMESPath
     def nud_lparen(stream)
       stream.next
       result = expr(stream, 0)
-      raise Errors::SyntaxError, 'Unclosed `(`' if stream.token.type != Lexer::T_RPAREN
-
+      if stream.token.type != Lexer::T_RPAREN
+        raise Errors::SyntaxError, 'Unclosed `(`'
+      end
       stream.next
       result
     end
@@ -107,14 +109,15 @@ module JMESPath
     end
 
     def nud_lbrace(stream)
-      valid_keys = Set.new(%i[quoted_identifier identifier])
-      stream.next(match: valid_keys)
+      valid_keys = Set.new([:quoted_identifier, :identifier])
+      stream.next(match:valid_keys)
       pairs = []
-      loop do
+      begin
         pairs << parse_key_value_pair(stream)
-        stream.next(match: valid_keys) if stream.token.type == :comma
-        break unless stream.token.type != :rbrace
-      end
+        if stream.token.type == :comma
+          stream.next(match:valid_keys)
+        end
+      end while stream.token.type != :rbrace
       stream.next
       Nodes::MultiSelectHash.new(pairs)
     end
@@ -122,7 +125,7 @@ module JMESPath
     def nud_lbracket(stream)
       stream.next
       type = stream.token.type
-      if %i[number colon].include?(type)
+      if type == :number || type == :colon
         parse_array_index_expression(stream)
       elsif type == :star && stream.lookahead(1).type == :rbracket
         parse_wildcard_array(stream)
@@ -164,7 +167,7 @@ module JMESPath
     end
 
     def led_dot(stream, left)
-      stream.next(match: AFTER_DOT)
+      stream.next(match:AFTER_DOT)
       if stream.token.type == :star
         parse_wildcard_object(stream, left)
       else
@@ -176,8 +179,9 @@ module JMESPath
     def led_filter(stream, left)
       stream.next
       expression = expr(stream)
-      raise Errors::SyntaxError, 'expected a closing rbracket for the filter' if stream.token.type != Lexer::T_RBRACKET
-
+      if stream.token.type != Lexer::T_RBRACKET
+        raise Errors::SyntaxError, 'expected a closing rbracket for the filter'
+      end
       stream.next
       rhs = parse_projection(stream, Token::BINDING_POWER[Lexer::T_FILTER])
       left ||= CURRENT_NODE
@@ -193,9 +197,9 @@ module JMESPath
     end
 
     def led_lbracket(stream, left)
-      stream.next(match: Set.new(%i[number colon star]))
+      stream.next(match: Set.new([:number, :colon, :star]))
       type = stream.token.type
-      if %i[number colon].include?(type)
+      if type == :number || type == :colon
         right = parse_array_index_expression(stream)
         Nodes::Subexpression.new(left, right)
       else
@@ -205,7 +209,7 @@ module JMESPath
 
     def led_lparen(stream, left)
       args = []
-      if left.is_a?(Nodes::Function::FunctionName)
+      if Nodes::Function::FunctionName === left
         name = left.name
       else
         raise Errors::SyntaxError, 'invalid function invocation'
@@ -213,10 +217,12 @@ module JMESPath
       stream.next
       while stream.token.type != :rparen
         args << expr(stream, 0)
-        stream.next if stream.token.type == :comma
+        if stream.token.type == :comma
+          stream.next
+        end
       end
       stream.next
-      Nodes::Function.create(name, args, disable_visit_errors: @disable_visit_errors)
+      Nodes::Function.create(name, args, :disable_visit_errors => @disable_visit_errors)
     end
 
     def led_or(stream, left)
@@ -243,22 +249,20 @@ module JMESPath
       parts = [nil, nil, nil]
       expected = NUM_COLON_RBRACKET
 
-      loop do
-        case stream.token.type
-        when Lexer::T_COLON
+      begin
+        if stream.token.type == Lexer::T_COLON
           pos += 1
           expected = NUM_COLON_RBRACKET
-        when Lexer::T_NUMBER
+        elsif stream.token.type == Lexer::T_NUMBER
           parts[pos] = stream.token.value
           expected = COLON_RBRACKET
         end
         stream.next(match: expected)
-        break unless stream.token.type != Lexer::T_RBRACKET
-      end
+      end while stream.token.type != Lexer::T_RBRACKET
 
       stream.next # consume the closing bracket
 
-      if pos.zero?
+      if pos == 0
         # no colons found, this is a single index extraction
         Nodes::Index.new(parts[0])
       elsif pos > 2
@@ -282,21 +286,22 @@ module JMESPath
 
     def parse_key_value_pair(stream)
       key = stream.token.value
-      stream.next(match: Set.new([:colon]))
+      stream.next(match:Set.new([:colon]))
       stream.next
       Nodes::MultiSelectHash::KeyValuePair.new(key, expr(stream))
     end
 
     def parse_multi_select_list(stream)
       nodes = []
-      loop do
+      begin
         nodes << expr(stream)
         if stream.token.type == :comma
           stream.next
-          raise Errors::SyntaxError, 'expression epxected, found rbracket' if stream.token.type == :rbracket
+          if stream.token.type == :rbracket
+            raise Errors::SyntaxError, 'expression epxected, found rbracket'
+          end
         end
-        break unless stream.token.type != :rbracket
-      end
+      end while stream.token.type != :rbracket
       stream.next
       Nodes::MultiSelectList.new(nodes)
     end
@@ -306,9 +311,9 @@ module JMESPath
       if stream.token.binding_power < 10
         CURRENT_NODE
       elsif type == :dot
-        stream.next(match: AFTER_DOT)
+        stream.next(match:AFTER_DOT)
         parse_dot(stream, binding_power)
-      elsif %i[lbracket filter].include?(type)
+      elsif type == :lbracket || type == :filter
         expr(stream, binding_power)
       else
         raise Errors::SyntaxError, 'syntax error after projection'
@@ -316,7 +321,7 @@ module JMESPath
     end
 
     def parse_wildcard_array(stream, left = nil)
-      stream.next(match: Set.new([:rbracket]))
+      stream.next(match:Set.new([:rbracket]))
       stream.next
       left ||= CURRENT_NODE
       right = parse_projection(stream, Token::BINDING_POWER[:star])
@@ -329,5 +334,6 @@ module JMESPath
       right = parse_projection(stream, Token::BINDING_POWER[:star])
       Nodes::ObjectProjection.new(left, right)
     end
+
   end
 end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
-eval_gemfile(File.expand_path('../Gemfile', __dir__))
+eval_gemfile(File.expand_path('../../Gemfile', __FILE__))
 
 # no dependency on `json` gem

@@ -1,11 +1,10 @@
-# frozen_string_literal: true
-
 require 'json'
 require 'set'
 
 module JMESPath
   # @api private
   class Lexer
+
     T_DOT = :dot
     T_STAR = :star
     T_COMMA = :comma
@@ -48,103 +47,103 @@ module JMESPath
     STATE_AND = 13
 
     TRANSLATION_TABLE = {
-      '<' => STATE_LT,
-      '>' => STATE_GT,
-      '=' => STATE_EQ,
-      '!' => STATE_NOT,
-      '[' => STATE_LBRACKET,
-      '|' => STATE_PIPE,
-      '&' => STATE_AND,
-      '`' => STATE_JSON_LITERAL,
-      '"' => STATE_QUOTED_STRING,
-      "'" => STATE_STRING_LITERAL,
-      '-' => STATE_NUMBER,
-      '0' => STATE_NUMBER,
-      '1' => STATE_NUMBER,
-      '2' => STATE_NUMBER,
-      '3' => STATE_NUMBER,
-      '4' => STATE_NUMBER,
-      '5' => STATE_NUMBER,
-      '6' => STATE_NUMBER,
-      '7' => STATE_NUMBER,
-      '8' => STATE_NUMBER,
-      '9' => STATE_NUMBER,
-      ' ' => STATE_WHITESPACE,
+      '<'  => STATE_LT,
+      '>'  => STATE_GT,
+      '='  => STATE_EQ,
+      '!'  => STATE_NOT,
+      '['  => STATE_LBRACKET,
+      '|'  => STATE_PIPE,
+      '&'  => STATE_AND,
+      '`'  => STATE_JSON_LITERAL,
+      '"'  => STATE_QUOTED_STRING,
+      "'"  => STATE_STRING_LITERAL,
+      '-'  => STATE_NUMBER,
+      '0'  => STATE_NUMBER,
+      '1'  => STATE_NUMBER,
+      '2'  => STATE_NUMBER,
+      '3'  => STATE_NUMBER,
+      '4'  => STATE_NUMBER,
+      '5'  => STATE_NUMBER,
+      '6'  => STATE_NUMBER,
+      '7'  => STATE_NUMBER,
+      '8'  => STATE_NUMBER,
+      '9'  => STATE_NUMBER,
+      ' '  => STATE_WHITESPACE,
       "\t" => STATE_WHITESPACE,
       "\n" => STATE_WHITESPACE,
       "\r" => STATE_WHITESPACE,
-      '.' => STATE_SINGLE_CHAR,
-      '*' => STATE_SINGLE_CHAR,
-      ']' => STATE_SINGLE_CHAR,
-      ',' => STATE_SINGLE_CHAR,
-      ':' => STATE_SINGLE_CHAR,
-      '@' => STATE_SINGLE_CHAR,
-      '(' => STATE_SINGLE_CHAR,
-      ')' => STATE_SINGLE_CHAR,
-      '{' => STATE_SINGLE_CHAR,
-      '}' => STATE_SINGLE_CHAR,
-      '_' => STATE_IDENTIFIER,
-      'A' => STATE_IDENTIFIER,
-      'B' => STATE_IDENTIFIER,
-      'C' => STATE_IDENTIFIER,
-      'D' => STATE_IDENTIFIER,
-      'E' => STATE_IDENTIFIER,
-      'F' => STATE_IDENTIFIER,
-      'G' => STATE_IDENTIFIER,
-      'H' => STATE_IDENTIFIER,
-      'I' => STATE_IDENTIFIER,
-      'J' => STATE_IDENTIFIER,
-      'K' => STATE_IDENTIFIER,
-      'L' => STATE_IDENTIFIER,
-      'M' => STATE_IDENTIFIER,
-      'N' => STATE_IDENTIFIER,
-      'O' => STATE_IDENTIFIER,
-      'P' => STATE_IDENTIFIER,
-      'Q' => STATE_IDENTIFIER,
-      'R' => STATE_IDENTIFIER,
-      'S' => STATE_IDENTIFIER,
-      'T' => STATE_IDENTIFIER,
-      'U' => STATE_IDENTIFIER,
-      'V' => STATE_IDENTIFIER,
-      'W' => STATE_IDENTIFIER,
-      'X' => STATE_IDENTIFIER,
-      'Y' => STATE_IDENTIFIER,
-      'Z' => STATE_IDENTIFIER,
-      'a' => STATE_IDENTIFIER,
-      'b' => STATE_IDENTIFIER,
-      'c' => STATE_IDENTIFIER,
-      'd' => STATE_IDENTIFIER,
-      'e' => STATE_IDENTIFIER,
-      'f' => STATE_IDENTIFIER,
-      'g' => STATE_IDENTIFIER,
-      'h' => STATE_IDENTIFIER,
-      'i' => STATE_IDENTIFIER,
-      'j' => STATE_IDENTIFIER,
-      'k' => STATE_IDENTIFIER,
-      'l' => STATE_IDENTIFIER,
-      'm' => STATE_IDENTIFIER,
-      'n' => STATE_IDENTIFIER,
-      'o' => STATE_IDENTIFIER,
-      'p' => STATE_IDENTIFIER,
-      'q' => STATE_IDENTIFIER,
-      'r' => STATE_IDENTIFIER,
-      's' => STATE_IDENTIFIER,
-      't' => STATE_IDENTIFIER,
-      'u' => STATE_IDENTIFIER,
-      'v' => STATE_IDENTIFIER,
-      'w' => STATE_IDENTIFIER,
-      'x' => STATE_IDENTIFIER,
-      'y' => STATE_IDENTIFIER,
-      'z' => STATE_IDENTIFIER
-    }.freeze
+      '.'  => STATE_SINGLE_CHAR,
+      '*'  => STATE_SINGLE_CHAR,
+      ']'  => STATE_SINGLE_CHAR,
+      ','  => STATE_SINGLE_CHAR,
+      ':'  => STATE_SINGLE_CHAR,
+      '@'  => STATE_SINGLE_CHAR,
+      '('  => STATE_SINGLE_CHAR,
+      ')'  => STATE_SINGLE_CHAR,
+      '{'  => STATE_SINGLE_CHAR,
+      '}'  => STATE_SINGLE_CHAR,
+      '_'  => STATE_IDENTIFIER,
+      'A'  => STATE_IDENTIFIER,
+      'B'  => STATE_IDENTIFIER,
+      'C'  => STATE_IDENTIFIER,
+      'D'  => STATE_IDENTIFIER,
+      'E'  => STATE_IDENTIFIER,
+      'F'  => STATE_IDENTIFIER,
+      'G'  => STATE_IDENTIFIER,
+      'H'  => STATE_IDENTIFIER,
+      'I'  => STATE_IDENTIFIER,
+      'J'  => STATE_IDENTIFIER,
+      'K'  => STATE_IDENTIFIER,
+      'L'  => STATE_IDENTIFIER,
+      'M'  => STATE_IDENTIFIER,
+      'N'  => STATE_IDENTIFIER,
+      'O'  => STATE_IDENTIFIER,
+      'P'  => STATE_IDENTIFIER,
+      'Q'  => STATE_IDENTIFIER,
+      'R'  => STATE_IDENTIFIER,
+      'S'  => STATE_IDENTIFIER,
+      'T'  => STATE_IDENTIFIER,
+      'U'  => STATE_IDENTIFIER,
+      'V'  => STATE_IDENTIFIER,
+      'W'  => STATE_IDENTIFIER,
+      'X'  => STATE_IDENTIFIER,
+      'Y'  => STATE_IDENTIFIER,
+      'Z'  => STATE_IDENTIFIER,
+      'a'  => STATE_IDENTIFIER,
+      'b'  => STATE_IDENTIFIER,
+      'c'  => STATE_IDENTIFIER,
+      'd'  => STATE_IDENTIFIER,
+      'e'  => STATE_IDENTIFIER,
+      'f'  => STATE_IDENTIFIER,
+      'g'  => STATE_IDENTIFIER,
+      'h'  => STATE_IDENTIFIER,
+      'i'  => STATE_IDENTIFIER,
+      'j'  => STATE_IDENTIFIER,
+      'k'  => STATE_IDENTIFIER,
+      'l'  => STATE_IDENTIFIER,
+      'm'  => STATE_IDENTIFIER,
+      'n'  => STATE_IDENTIFIER,
+      'o'  => STATE_IDENTIFIER,
+      'p'  => STATE_IDENTIFIER,
+      'q'  => STATE_IDENTIFIER,
+      'r'  => STATE_IDENTIFIER,
+      's'  => STATE_IDENTIFIER,
+      't'  => STATE_IDENTIFIER,
+      'u'  => STATE_IDENTIFIER,
+      'v'  => STATE_IDENTIFIER,
+      'w'  => STATE_IDENTIFIER,
+      'x'  => STATE_IDENTIFIER,
+      'y'  => STATE_IDENTIFIER,
+      'z'  => STATE_IDENTIFIER,
+    }
 
-    VALID_IDENTIFIERS = Set.new(%w[
-                                  A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-                                  a b c d e f g h i j k l m n o p q r s t u v w x y z
-                                  _ 0 1 2 3 4 5 6 7 8 9
-                                ])
+    VALID_IDENTIFIERS = Set.new(%w(
+      A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+      a b c d e f g h i j k l m n o p q r s t u v w x y z
+      _ 0 1 2 3 4 5 6 7 8 9
+    ))
 
-    NUMBERS = Set.new(%w[0 1 2 3 4 5 6 7 8 9])
+    NUMBERS = Set.new(%w(0 1 2 3 4 5 6 7 8 9))
 
     SIMPLE_TOKENS = {
       '.' => T_DOT,
@@ -156,12 +155,13 @@ module JMESPath
       '(' => T_LPAREN,
       ')' => T_RPAREN,
       '{' => T_LBRACE,
-      '}' => T_RBRACE
-    }.freeze
+      '}' => T_RBRACE,
+    }
 
     # @param [String<JMESPath>] expression
     # @return [Array<Hash>]
     def tokenize(expression)
+
       tokens = []
       chars = CharacterStream.new(expression.chars.to_a)
 
@@ -185,11 +185,10 @@ module JMESPath
         when STATE_IDENTIFIER
           start = chars.position
           buffer = []
-          loop do
+          begin
             buffer << chars.current
             chars.next
-            break unless VALID_IDENTIFIERS.include?(chars.current)
-          end
+          end while VALID_IDENTIFIERS.include?(chars.current)
           tokens << Token.new(
             T_IDENTIFIER,
             buffer.join,
@@ -202,11 +201,10 @@ module JMESPath
           # consume "[", "[?" and "[]"
           position = chars.position
           actual = chars.next
-          case actual
-          when ']'
+          if actual == ']'
             chars.next
             tokens << Token.new(T_FLATTEN, '[]', position)
-          when '?'
+          elsif actual == '?'
             chars.next
             tokens << Token.new(T_FILTER, '[?', position)
           else
@@ -231,11 +229,10 @@ module JMESPath
         when STATE_NUMBER
           start = chars.position
           buffer = []
-          loop do
+          begin
             buffer << chars.current
             chars.next
-            break unless NUMBERS.include?(chars.current)
-          end
+          end while NUMBERS.include?(chars.current)
           tokens << Token.new(
             T_NUMBER,
             buffer.join.to_i,
@@ -256,7 +253,7 @@ module JMESPath
           tokens << match_or(chars, '&', '&', T_AND, T_EXPREF)
         when STATE_NOT
           # consume not equals
-          tokens << match_or(chars, '!', '=', T_COMPARATOR, T_NOT)
+          tokens << match_or(chars, '!', '=', T_COMPARATOR, T_NOT);
         else
           # either '<' or '>'
           # consume less than and greater than
@@ -291,7 +288,6 @@ module JMESPath
           # unclosed delimiter
           return Token.new(T_UNKNOWN, buffer.join, position)
         end
-
         buffer << current
         current = chars.next
       end
@@ -325,9 +321,11 @@ module JMESPath
     # if we have to wrap scalar JSON values to parse them or not.
     # @api private
     def self.requires_wrapping?
-      JSON.parse('false')
-    rescue JSON::ParserError
-      true
+      begin
+        JSON.parse('false')
+      rescue JSON::ParserError
+        true
+      end
     end
 
     if requires_wrapping?
@@ -338,8 +336,8 @@ module JMESPath
           else
             begin
               token.value = JSON.parse("{\"value\":#{token.value}}")['value']
-            rescue StandardError
-              token.value = JSON.parse(format('{"value":"%s"}', token.value.lstrip))['value']
+            rescue
+              token.value = JSON.parse(sprintf('{"value":"%s"}', token.value.lstrip))['value']
             end
           end
         rescue JSON::ParserError
@@ -350,15 +348,11 @@ module JMESPath
     else
       def parse_json(token, quoted = false)
         begin
-          token.value = if quoted
-                          JSON.parse(token.value)
-                        else
-                          begin
-                            JSON.parse(token.value)
-                          rescue StandardError
-                            JSON.parse(format('"%s"', token.value.lstrip))
-                          end
-                        end
+          if quoted
+            token.value = JSON.parse(token.value)
+          else
+            token.value = JSON.parse(token.value) rescue JSON.parse(sprintf('"%s"', token.value.lstrip))
+          end
         rescue JSON::ParserError
           token.type = T_UNKNOWN
         end
@@ -367,6 +361,7 @@ module JMESPath
     end
 
     class CharacterStream
+
       def initialize(chars)
         @chars = chars
         @position = 0
@@ -381,7 +376,10 @@ module JMESPath
         @chars[@position]
       end
 
-      attr_reader :position
+      def position
+        @position
+      end
+
     end
   end
 end

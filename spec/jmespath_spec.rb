@@ -1,25 +1,24 @@
-# frozen_string_literal: true
-
 require 'spec_helper'
 
 module JMESPath
   describe '.search' do
+
     it 'searches data' do
       expression = 'foo.bar'
-      data = { 'foo' => { 'bar' => 'value' } }
+      data = {'foo' => {'bar' => 'value'}}
       expect(JMESPath.search(expression, data)).to eq('value')
     end
 
     it 'accepts data as a Pathname' do
       file_path = File.join(File.dirname(__FILE__), 'fixtures', 'sample.json')
       file_path = Pathname.new(file_path)
-      expect(JMESPath.search('foo.*.baz', file_path)).to eq([1, 2, 3])
+      expect(JMESPath.search('foo.*.baz', file_path)).to eq([1,2,3])
     end
 
     it 'accepts data as an IO object' do
       file_path = File.join(File.dirname(__FILE__), 'fixtures', 'sample.json')
       File.open(file_path, 'r') do |file|
-        expect(JMESPath.search('foo.*.baz', file)).to eq([1, 2, 3])
+        expect(JMESPath.search('foo.*.baz', file)).to eq([1,2,3])
       end
     end
 

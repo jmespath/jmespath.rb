@@ -1,8 +1,6 @@
-# frozen_string_literal: true
-
 Gem::Specification.new do |spec|
   spec.name          = 'jmespath'
-  spec.version       = File.read(File.expand_path('VERSION', __dir__)).strip
+  spec.version       = File.read(File.expand_path('../VERSION', __FILE__)).strip
   spec.summary       = 'JMESPath - Ruby Edition'
   spec.description   = 'Implements JMESPath for Ruby'
   spec.author        = 'Trevor Rowe'

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module JMESPath
   # @api private
   module Nodes
@@ -8,35 +6,34 @@ module JMESPath
         @start = start
         @stop = stop
         @step = step
-        raise Errors::InvalidValueError, 'slice step cannot be 0' if @step == 0
+        raise Errors::InvalidValueError.new('slice step cannot be 0') if @step == 0
       end
 
       def visit(value)
-        if (value = if value.respond_to?(:to_str)
-                      value.to_str
-                    else
-                      value.respond_to?(:to_ary) ? value.to_ary : nil
-                    end)
+        if (value = value.respond_to?(:to_str) ? value.to_str : value.respond_to?(:to_ary) ? value.to_ary : nil)
           start, stop, step = adjust_slice(value.size, @start, @stop, @step)
           result = []
-          i = start
-          if step.positive?
+          if step > 0
+            i = start
             while i < stop
               result << value[i]
               i += step
             end
           else
+            i = start
             while i > stop
               result << value[i]
               i += step
             end
           end
           value.respond_to?(:to_str) ? result.join : result
+        else
+          nil
         end
       end
 
       def optimize
-        if (@step.nil? || @step == 1) && @start && @stop && @start.positive? && @stop > @start
+        if (@step.nil? || @step == 1) && @start && @stop && @start > 0 && @stop > @start
           SimpleSlice.new(@start, @stop)
         else
           self
@@ -46,29 +43,31 @@ module JMESPath
       private
 
       def adjust_slice(length, start, stop, step)
-        step = 1 if step.nil?
+        if step.nil?
+          step = 1
+        end
 
-        start = if start.nil?
-                  step.negative? ? length - 1 : 0
-                else
-                  adjust_endpoint(length, start, step)
-                end
+        if start.nil?
+          start = step < 0 ? length - 1 : 0
+        else
+          start = adjust_endpoint(length, start, step)
+        end
 
-        stop = if stop.nil?
-                 step.negative? ? -1 : length
-               else
-                 adjust_endpoint(length, stop, step)
-               end
+        if stop.nil?
+          stop = step < 0 ? -1 : length
+        else
+          stop = adjust_endpoint(length, stop, step)
+        end
         [start, stop, step]
       end
 
       def adjust_endpoint(length, endpoint, step)
-        if endpoint.negative?
+        if endpoint < 0
           endpoint += length
-          endpoint = step.negative? ? -1 : 0 if endpoint.negative?
+          endpoint = step < 0 ? -1 : 0 if endpoint < 0
           endpoint
         elsif endpoint >= length
-          step.negative? ? length - 1 : length
+          step < 0 ? length - 1 : length
         else
           endpoint
         end
@@ -81,12 +80,10 @@ module JMESPath
       end
 
       def visit(value)
-        if (value = if value.respond_to?(:to_str)
-                      value.to_str
-                    else
-                      value.respond_to?(:to_ary) ? value.to_ary : nil
-                    end)
+        if (value = value.respond_to?(:to_str) ? value.to_str : value.respond_to?(:to_ary) ? value.to_ary : nil)
           value[@start, @stop - @start]
+        else
+          nil
         end
       end
     end

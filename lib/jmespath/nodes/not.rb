@@ -1,8 +1,7 @@
-# frozen_string_literal: true
-
 module JMESPath
   module Nodes
     class Not < Node
+
       def initialize(expression)
         @expression = expression
       end
@@ -14,6 +13,7 @@ module JMESPath
       def optimize
         self.class.new(@expression.optimize)
       end
+
     end
   end
 end

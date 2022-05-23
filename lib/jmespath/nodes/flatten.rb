@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module JMESPath
   # @api private
   module Nodes
@@ -18,6 +16,8 @@ module JMESPath
               values.push(v)
             end
           end
+        else
+          nil
         end
       end
 
