@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   module Nodes
@@ -35,7 +36,7 @@ module JMESPath
 
       private
 
-      def check(left_value, right_value)
+      def check(_left_value, _right_value)
         nil
       end
 
@@ -47,7 +48,6 @@ module JMESPath
     end
 
     module Comparators
-
       class Eq < Comparator
         def check(left_value, right_value)
           Util.as_json(left_value) == Util.as_json(right_value)
@@ -62,41 +62,25 @@ module JMESPath
 
       class Gt < Comparator
         def check(left_value, right_value)
-          if comparable?(left_value, right_value)
-            left_value > right_value
-          else
-            nil
-          end
+          left_value > right_value if comparable?(left_value, right_value)
         end
       end
 
       class Gte < Comparator
         def check(left_value, right_value)
-          if comparable?(left_value, right_value)
-            left_value >= right_value
-          else
-            nil
-          end
+          left_value >= right_value if comparable?(left_value, right_value)
         end
       end
 
       class Lt < Comparator
         def check(left_value, right_value)
-          if comparable?(left_value, right_value)
-            left_value < right_value
-          else
-            nil
-          end
+          left_value < right_value if comparable?(left_value, right_value)
         end
       end
 
       class Lte < Comparator
         def check(left_value, right_value)
-          if comparable?(left_value, right_value)
-            left_value <= right_value
-          else
-            nil
-          end
+          left_value <= right_value if comparable?(left_value, right_value)
         end
       end
     end

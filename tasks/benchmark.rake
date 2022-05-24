@@ -1,6 +1,6 @@
+# frozen_string_literal: true
 desc 'Runs the benchmark suite'
 task 'benchmark' do
-
   require 'jmespath'
   require 'absolute_time'
 
@@ -11,7 +11,6 @@ task 'benchmark' do
   Dir.glob('benchmark/*.json').each do |path|
     JMESPath.load_json(path).first.tap do |scenario|
       scenario['cases'].each do |test_case|
-
         expression = test_case['expression']
         data = scenario['given']
 
@@ -24,7 +23,6 @@ task 'benchmark' do
 
         label = "#{scenario['description']} - #{test_case['name']}"
         printf("%fms, %s\n" % [time * 1000, label])
-
       end
     end
   end
@@ -32,5 +30,5 @@ end
 
 desc 'Runs the benchmark suite, with expression caching'
 task 'benchmark:cached' do
-  sh({"CACHE" => "1"}, "bundle exec rake benchmark")
+  sh({ 'CACHE' => '1' }, 'bundle exec rake benchmark')
 end

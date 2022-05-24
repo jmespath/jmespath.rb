@@ -1,7 +1,7 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   class Token < Struct.new(:type, :value, :position, :binding_power)
-
     NULL_TOKEN = Token.new(:eof, '', nil)
 
     BINDING_POWER = {
@@ -28,8 +28,8 @@ module JMESPath
       Lexer::T_NOT               => 45,
       Lexer::T_LBRACE            => 50,
       Lexer::T_LBRACKET          => 55,
-      Lexer::T_LPAREN            => 60,
-    }
+      Lexer::T_LPAREN            => 60
+    }.freeze
 
     # @param [Symbol] type
     # @param [Mixed] value
@@ -37,6 +37,5 @@ module JMESPath
     def initialize(type, value, position)
       super(type, value, position, BINDING_POWER[type])
     end
-
   end
 end

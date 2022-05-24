@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   module Nodes
@@ -9,11 +10,11 @@ module JMESPath
         self
       end
 
-      def chains_with?(other)
+      def chains_with?(_other)
         false
       end
     end
-    
+
     require  'jmespath/nodes/subexpression'
     require  'jmespath/nodes/and'
     require  'jmespath/nodes/comparator'
@@ -35,7 +36,5 @@ module JMESPath
     require  'jmespath/nodes/projection'
     require  'jmespath/nodes/projection'
     require  'jmespath/nodes/slice'
-
-
   end
 end

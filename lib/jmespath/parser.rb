@@ -1,28 +1,28 @@
+# frozen_string_literal: true
 require 'set'
 
 module JMESPath
   # @api private
   class Parser
-
     AFTER_DOT = Set.new([
-      Lexer::T_IDENTIFIER,        # foo.bar
-      Lexer::T_QUOTED_IDENTIFIER, # foo."bar"
-      Lexer::T_STAR,              # foo.*
-      Lexer::T_LBRACE,            # foo{a: 0}
-      Lexer::T_LBRACKET,          # foo[1]
-      Lexer::T_FILTER,            # foo.[?bar==10]
-    ])
+                          Lexer::T_IDENTIFIER, # foo.bar
+                          Lexer::T_QUOTED_IDENTIFIER, # foo."bar"
+                          Lexer::T_STAR,              # foo.*
+                          Lexer::T_LBRACE,            # foo{a: 0}
+                          Lexer::T_LBRACKET,          # foo[1]
+                          Lexer::T_FILTER,            # foo.[?bar==10]
+                        ])
 
     NUM_COLON_RBRACKET = Set.new([
-      Lexer::T_NUMBER,
-      Lexer::T_COLON,
-      Lexer::T_RBRACKET,
-    ])
+                                   Lexer::T_NUMBER,
+                                   Lexer::T_COLON,
+                                   Lexer::T_RBRACKET
+                                 ])
 
     COLON_RBRACKET = Set.new([
-      Lexer::T_COLON,
-      Lexer::T_RBRACKET,
-    ])
+                               Lexer::T_COLON,
+                               Lexer::T_RBRACKET
+                             ])
 
     CURRENT_NODE = Nodes::Current.new
 
@@ -34,7 +34,7 @@ module JMESPath
 
     # @param [String<JMESPath>] expression
     def parse(expression)
-      tokens =  @lexer.tokenize(expression)
+      tokens = @lexer.tokenize(expression)
       stream = TokenStream.new(expression, tokens)
       result = expr(stream)
       if stream.token.type != Lexer::T_EOF
@@ -110,13 +110,11 @@ module JMESPath
 
     def nud_lbrace(stream)
       valid_keys = Set.new([:quoted_identifier, :identifier])
-      stream.next(match:valid_keys)
+      stream.next(match: valid_keys)
       pairs = []
       begin
         pairs << parse_key_value_pair(stream)
-        if stream.token.type == :comma
-          stream.next(match:valid_keys)
-        end
+        stream.next(match: valid_keys) if stream.token.type == :comma
       end while stream.token.type != :rbrace
       stream.next
       Nodes::MultiSelectHash.new(pairs)
@@ -167,7 +165,7 @@ module JMESPath
     end
 
     def led_dot(stream, left)
-      stream.next(match:AFTER_DOT)
+      stream.next(match: AFTER_DOT)
       if stream.token.type == :star
         parse_wildcard_object(stream, left)
       else
@@ -217,12 +215,10 @@ module JMESPath
       stream.next
       while stream.token.type != :rparen
         args << expr(stream, 0)
-        if stream.token.type == :comma
-          stream.next
-        end
+        stream.next if stream.token.type == :comma
       end
       stream.next
-      Nodes::Function.create(name, args, :disable_visit_errors => @disable_visit_errors)
+      Nodes::Function.create(name, args, disable_visit_errors: @disable_visit_errors)
     end
 
     def led_or(stream, left)
@@ -286,7 +282,7 @@ module JMESPath
 
     def parse_key_value_pair(stream)
       key = stream.token.value
-      stream.next(match:Set.new([:colon]))
+      stream.next(match: Set.new([:colon]))
       stream.next
       Nodes::MultiSelectHash::KeyValuePair.new(key, expr(stream))
     end
@@ -311,7 +307,7 @@ module JMESPath
       if stream.token.binding_power < 10
         CURRENT_NODE
       elsif type == :dot
-        stream.next(match:AFTER_DOT)
+        stream.next(match: AFTER_DOT)
         parse_dot(stream, binding_power)
       elsif type == :lbracket || type == :filter
         expr(stream, binding_power)
@@ -321,7 +317,7 @@ module JMESPath
     end
 
     def parse_wildcard_array(stream, left = nil)
-      stream.next(match:Set.new([:rbracket]))
+      stream.next(match: Set.new([:rbracket]))
       stream.next
       left ||= CURRENT_NODE
       right = parse_projection(stream, Token::BINDING_POWER[:star])
@@ -334,6 +330,5 @@ module JMESPath
       right = parse_projection(stream, Token::BINDING_POWER[:star])
       Nodes::ObjectProjection.new(left, right)
     end
-
   end
 end

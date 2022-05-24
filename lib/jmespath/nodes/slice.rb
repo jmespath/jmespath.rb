@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   module Nodes
@@ -6,7 +7,7 @@ module JMESPath
         @start = start
         @stop = stop
         @step = step
-        raise Errors::InvalidValueError.new('slice step cannot be 0') if @step == 0
+        raise Errors::InvalidValueError, 'slice step cannot be 0' if @step == 0
       end
 
       def visit(value)
@@ -27,8 +28,6 @@ module JMESPath
             end
           end
           value.respond_to?(:to_str) ? result.join : result
-        else
-          nil
         end
       end
 
@@ -43,21 +42,19 @@ module JMESPath
       private
 
       def adjust_slice(length, start, stop, step)
-        if step.nil?
-          step = 1
-        end
+        step = 1 if step.nil?
 
-        if start.nil?
-          start = step < 0 ? length - 1 : 0
-        else
-          start = adjust_endpoint(length, start, step)
-        end
+        start = if start.nil?
+                  step < 0 ? length - 1 : 0
+                else
+                  adjust_endpoint(length, start, step)
+                end
 
-        if stop.nil?
-          stop = step < 0 ? -1 : length
-        else
-          stop = adjust_endpoint(length, stop, step)
-        end
+        stop = if stop.nil?
+                 step < 0 ? -1 : length
+               else
+                 adjust_endpoint(length, stop, step)
+               end
         [start, stop, step]
       end
 
@@ -82,8 +79,6 @@ module JMESPath
       def visit(value)
         if (value = value.respond_to?(:to_str) ? value.to_str : value.respond_to?(:to_ary) ? value.to_ary : nil)
           value[@start, @stop - @start]
-        else
-          nil
         end
       end
     end
