@@ -29,7 +29,6 @@ module JMESPath
     class ComparatorCondition < Node
       COMPARATOR_TO_CONDITION = {}
       COMPARABLE_TYPES = [Integer, Float, String].freeze
-      NUMERIC_TYPES = [Integer, Float].freeze
       def initialize(left, right, child)
         @left = left
         @right = right
@@ -45,7 +44,7 @@ module JMESPath
       def comparable?(left_value, right_value)
         if COMPARABLE_TYPES.include?(left_value.class) && COMPARABLE_TYPES.include?(right_value.class)
           return true if left_value.class == right_value.class
-          return true if NUMERIC_TYPES.include?(left_value.class) && NUMERIC_TYPES.include?(right_value.class)
+          return true if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
         end
       end
     end
