@@ -44,8 +44,7 @@ module JMESPath
 
       def comparable?(left_value, right_value)
         if COMPARABLE_TYPES.include?(left_value.class) && COMPARABLE_TYPES.include?(right_value.class)
-          return true if left_value.class == right_value.class
-          return true if left_value.is_a?(Numeric) && right_value.is_a?(Numeric)
+          (left_value.class == right_value.class) || (left_value.is_a?(Numeric) && right_value.is_a?(Numeric))
         end
       end
     end
