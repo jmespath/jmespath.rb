@@ -1,3 +1,8 @@
+Unreleased Changes
+------------------
+
+* Issue - Add jmespath.rb to gemspec executables.
+
 1.6.1 (2022-03-07)
 ------------------
 
