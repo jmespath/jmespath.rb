@@ -1,3 +1,8 @@
+Unreleased Changes
+------------------
+
+* Issue - Allow comparison of Numeric types (includes Float).
+
 1.6.1 (2022-03-07)
 ------------------
 
