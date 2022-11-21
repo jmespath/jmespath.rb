@@ -1,5 +1,19 @@
-Unreleased Changes
+1.6.1 (2022-03-07)
 ------------------
+
+* Issue - Use `JSON.parse` instead of `JSON.load`.
+
+1.6.0 (2022-02-14)
+------------------
+
+* Feature - Add support for string comparisons.
+
+1.5.0 (2022-01-10)
+------------------
+
+* Support implicitly convertible objects/duck-type values responding to `to_hash` and `to_ary`.
+
+  [See related GitHub pull request #51](https://github.com/jmespath/jmespath.rb/pull/51).
 
 1.4.0 (2018-04-04)
 ------------------
@@ -218,4 +232,3 @@ Unreleased Changes
 ------------------
 
 * Passing all of the JMESPath compliance tests.
-

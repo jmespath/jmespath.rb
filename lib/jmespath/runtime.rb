@@ -1,7 +1,7 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   class Runtime
-
     # @api private
     DEFAULT_PARSER = CachingParser
 
@@ -66,6 +66,5 @@ module JMESPath
         DEFAULT_PARSER.new(options)
       end
     end
-
   end
 end

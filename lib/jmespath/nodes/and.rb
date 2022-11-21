@@ -1,7 +1,7 @@
+# frozen_string_literal: true
 module JMESPath
   module Nodes
     class And < Node
-
       def initialize(left, right)
         @left = left
         @right = right
@@ -19,7 +19,6 @@ module JMESPath
       def optimize
         self.class.new(@left.optimize, @right.optimize)
       end
-
     end
   end
 end

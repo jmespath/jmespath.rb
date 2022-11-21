@@ -1,10 +1,10 @@
+# frozen_string_literal: true
 require 'json'
 require 'set'
 
 module JMESPath
   # @api private
   class Lexer
-
     T_DOT = :dot
     T_STAR = :star
     T_COMMA = :comma
@@ -134,14 +134,14 @@ module JMESPath
       'w'  => STATE_IDENTIFIER,
       'x'  => STATE_IDENTIFIER,
       'y'  => STATE_IDENTIFIER,
-      'z'  => STATE_IDENTIFIER,
-    }
+      'z'  => STATE_IDENTIFIER
+    }.freeze
 
     VALID_IDENTIFIERS = Set.new(%w(
-      A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-      a b c d e f g h i j k l m n o p q r s t u v w x y z
-      _ 0 1 2 3 4 5 6 7 8 9
-    ))
+                                  A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+                                  a b c d e f g h i j k l m n o p q r s t u v w x y z
+                                  _ 0 1 2 3 4 5 6 7 8 9
+                                ))
 
     NUMBERS = Set.new(%w(0 1 2 3 4 5 6 7 8 9))
 
@@ -155,13 +155,12 @@ module JMESPath
       '(' => T_LPAREN,
       ')' => T_RPAREN,
       '{' => T_LBRACE,
-      '}' => T_RBRACE,
-    }
+      '}' => T_RBRACE
+    }.freeze
 
     # @param [String<JMESPath>] expression
     # @return [Array<Hash>]
     def tokenize(expression)
-
       tokens = []
       chars = CharacterStream.new(expression.chars.to_a)
 
@@ -253,7 +252,7 @@ module JMESPath
           tokens << match_or(chars, '&', '&', T_AND, T_EXPREF)
         when STATE_NOT
           # consume not equals
-          tokens << match_or(chars, '!', '=', T_COMPARATOR, T_NOT);
+          tokens << match_or(chars, '!', '=', T_COMPARATOR, T_NOT)
         else
           # either '<' or '>'
           # consume less than and greater than
@@ -298,12 +297,12 @@ module JMESPath
     # Certain versions of Ruby and of the pure_json gem not support loading
     # scalar JSON values, such a numbers, booleans, strings, etc. These
     # simple values must be first wrapped inside a JSON object before calling
-    # `JSON.load`.
+    # `JSON.parse`.
     #
     #    # works in most JSON versions, raises in some versions
-    #    JSON.load("true")
-    #    JSON.load("123")
-    #    JSON.load("\"abc\"")
+    #    JSON.parse("true")
+    #    JSON.parse("123")
+    #    JSON.parse("\"abc\"")
     #
     # This is an known issue for:
     #
@@ -317,27 +316,25 @@ module JMESPath
     # causes issues in environments that cannot compile the gem. We previously
     # had a direct dependency on `json_pure`, but this broke with the v2 update.
     #
-    # This method allows us to detect how the `JSON.load` behaves so we know
+    # This method allows us to detect how the `JSON.parse` behaves so we know
     # if we have to wrap scalar JSON values to parse them or not.
     # @api private
     def self.requires_wrapping?
-      begin
-        JSON.load('false')
-      rescue JSON::ParserError
-        true
-      end
+      JSON.parse('false')
+    rescue JSON::ParserError
+      true
     end
 
     if requires_wrapping?
       def parse_json(token, quoted = false)
         begin
           if quoted
-            token.value = JSON.load("{\"value\":#{token.value}}")['value']
+            token.value = JSON.parse("{\"value\":#{token.value}}")['value']
           else
             begin
-              token.value = JSON.load("{\"value\":#{token.value}}")['value']
+              token.value = JSON.parse("{\"value\":#{token.value}}")['value']
             rescue
-              token.value = JSON.load(sprintf('{"value":"%s"}', token.value.lstrip))['value']
+              token.value = JSON.parse(sprintf('{"value":"%s"}', token.value.lstrip))['value']
             end
           end
         rescue JSON::ParserError
@@ -349,9 +346,13 @@ module JMESPath
       def parse_json(token, quoted = false)
         begin
           if quoted
-            token.value = JSON.load(token.value)
+            token.value = JSON.parse(token.value)
           else
-            token.value = JSON.load(token.value) rescue JSON.load(sprintf('"%s"', token.value.lstrip))
+            token.value = begin
+                            JSON.parse(token.value)
+                          rescue
+                            JSON.parse(sprintf('"%s"', token.value.lstrip))
+                          end
           end
         rescue JSON::ParserError
           token.type = T_UNKNOWN
@@ -361,7 +362,6 @@ module JMESPath
     end
 
     class CharacterStream
-
       def initialize(chars)
         @chars = chars
         @position = 0
@@ -376,10 +376,7 @@ module JMESPath
         @chars[@position]
       end
 
-      def position
-        @position
-      end
-
+      attr_reader :position
     end
   end
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   module Nodes
@@ -27,6 +28,7 @@ module JMESPath
 
     class ComparatorCondition < Node
       COMPARATOR_TO_CONDITION = {}
+      COMPARABLE_TYPES = [Integer, String].freeze
 
       def initialize(left, right, child)
         @left = left
@@ -34,8 +36,16 @@ module JMESPath
         @child = child
       end
 
-      def visit(value)
+      def visit(_value)
         nil
+      end
+
+      private
+
+      def comparable?(left_value, right_value)
+        COMPARABLE_TYPES.any? do |type|
+          left_value.is_a?(type) && right_value.is_a?(type)
+        end
       end
     end
 
@@ -43,7 +53,7 @@ module JMESPath
       COMPARATOR_TO_CONDITION[Comparators::Eq] = self
 
       def visit(value)
-        @left.visit(value) == @right.visit(value) ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) == Util.as_json(@right.visit(value)) ? @child.visit(value) : nil
       end
 
       def optimize
@@ -62,7 +72,7 @@ module JMESPath
       end
 
       def visit(value)
-        @left.visit(value) == @right ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) == @right ? @child.visit(value) : nil
       end
     end
 
@@ -70,7 +80,7 @@ module JMESPath
       COMPARATOR_TO_CONDITION[Comparators::Neq] = self
 
       def visit(value)
-        @left.visit(value) != @right.visit(value) ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) != Util.as_json(@right.visit(value)) ? @child.visit(value) : nil
       end
 
       def optimize
@@ -89,7 +99,7 @@ module JMESPath
       end
 
       def visit(value)
-        @left.visit(value) != @right ? @child.visit(value) : nil
+        Util.as_json(@left.visit(value)) != @right ? @child.visit(value) : nil
       end
     end
 
@@ -99,7 +109,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value > right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value > right_value ? @child.visit(value) : nil
       end
     end
 
@@ -109,7 +119,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value >= right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value >= right_value ? @child.visit(value) : nil
       end
     end
 
@@ -119,7 +129,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value < right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value < right_value ? @child.visit(value) : nil
       end
     end
 
@@ -129,7 +139,7 @@ module JMESPath
       def visit(value)
         left_value = @left.visit(value)
         right_value = @right.visit(value)
-        left_value.is_a?(Integer) && right_value.is_a?(Integer) && left_value <= right_value ? @child.visit(value) : nil
+        comparable?(left_value, right_value) && left_value <= right_value ? @child.visit(value) : nil
       end
     end
   end

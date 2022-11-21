@@ -207,6 +207,7 @@
       "two": 2,
       "three": 3,
       "emptylist": [],
+      "complexlist": [{}, []],
       "boolvalue": false
     },
     "cases": [
@@ -220,6 +221,22 @@
       },
       {
         "expression": "one == one",
+        "result": true
+      },
+      {
+        "expression": "emptylist == `[]`",
+        "result": true
+      },
+      {
+        "expression": "emptylist == emptylist",
+        "result": true
+      },
+      {
+        "expression": "complexlist == `[{}, []]`",
+        "result": true
+      },
+      {
+        "expression": "complexlist == complexlist",
         "result": true
       },
       {
@@ -269,6 +286,14 @@
       {
         "expression": "two < one || three < one",
         "result": false
+      },
+      {
+        "expression": "'2010-02-01' > '2011-05-01'",
+        "result": false
+      },
+      {
+        "expression": "'2010-02-01' <= '2011-05-01'",
+        "result": true
       }
     ]
   }

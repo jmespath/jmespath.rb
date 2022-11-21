@@ -1,7 +1,7 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   class TokenStream
-
     # @param [String<JMESPath>] expression
     # @param [Array<Token>] tokens
     def initialize(expression, tokens)
@@ -35,8 +35,8 @@ module JMESPath
     def inspect
       str = []
       @tokens.each do |token|
-        str << "%3d  %-15s %s" %
-         [token.position, token.type, token.value.inspect]
+        str << '%3d  %-15s %s' %
+               [token.position, token.type, token.value.inspect]
       end
       str.join("\n")
     end
@@ -50,11 +50,10 @@ module JMESPath
 
     def validate_match(token, match)
       if match && !match.include?(token.type)
-        raise Errors::SyntaxError, "type missmatch"
+        raise Errors::SyntaxError, 'type missmatch'
       else
         token
       end
     end
-
   end
 end

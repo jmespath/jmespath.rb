@@ -1,8 +1,8 @@
+# frozen_string_literal: true
 require 'thread'
 
 module JMESPath
   class CachingParser
-
     def initialize(options = {})
       @parser = options[:parser] || Parser.new(options)
       @mutex = Mutex.new
@@ -25,6 +25,5 @@ module JMESPath
         @cache[expression] = @parser.parse(expression)
       end
     end
-
   end
 end

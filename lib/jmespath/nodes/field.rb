@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module JMESPath
   # @api private
   module Nodes
@@ -8,9 +9,10 @@ module JMESPath
       end
 
       def visit(value)
-        if value.is_a?(Array) && @key.is_a?(Integer)
-          value[@key]
-        elsif value.is_a?(Hash)
+        if value.respond_to?(:to_ary) && @key.is_a?(Integer)
+          value.to_ary[@key]
+        elsif value.respond_to?(:to_hash)
+          value = value.to_hash
           if !(v = value[@key]).nil?
             v
           elsif @key_sym && !(v = value[@key_sym]).nil?
@@ -40,17 +42,16 @@ module JMESPath
       def initialize(keys)
         @keys = keys
         @key_syms = keys.each_with_object({}) do |k, syms|
-          if k.respond_to?(:to_sym)
-            syms[k] = k.to_sym
-          end
+          syms[k] = k.to_sym if k.respond_to?(:to_sym)
         end
       end
 
       def visit(obj)
         @keys.reduce(obj) do |value, key|
-          if value.is_a?(Array) && key.is_a?(Integer)
-            value[key]
-          elsif value.is_a?(Hash)
+          if value.respond_to?(:to_ary) && key.is_a?(Integer)
+            value.to_ary[key]
+          elsif value.respond_to?(:to_hash)
+            value = value.to_hash
             if !(v = value[key]).nil?
               v
             elsif (sym = @key_syms[key]) && !(v = value[sym]).nil?
@@ -68,10 +69,7 @@ module JMESPath
 
       private
 
-      def keys
-        @keys
-      end
-
+      attr_reader :keys
     end
   end
 end
