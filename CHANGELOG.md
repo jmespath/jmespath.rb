@@ -1,6 +1,9 @@
 Unreleased Changes
 ------------------
 
+1.6.2 (2022-11-25)
+------------------
+
 * Issue - Allow comparison of Numeric types (includes Float).
 
 * Issue - Add jmespath.rb to gemspec executables.
