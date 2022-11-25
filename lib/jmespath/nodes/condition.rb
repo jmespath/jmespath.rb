@@ -28,7 +28,7 @@ module JMESPath
 
     class ComparatorCondition < Node
       COMPARATOR_TO_CONDITION = {}
-      COMPARABLE_TYPES = [Integer, String].freeze
+      COMPARABLE_TYPES = [Numeric, String].freeze
 
       def initialize(left, right, child)
         @left = left
