@@ -13,10 +13,10 @@ module JMESPath
           value.to_ary[@key]
         elsif value.respond_to?(:to_hash)
           value = value.to_hash
-          if !(v = value[@key]).nil?
-            v
-          elsif @key_sym && !(v = value[@key_sym]).nil?
-            v
+          if value.key?(@key)
+            value[@key]
+          elsif @key_sym && value.key?(@key_sym)
+            value[@key_sym]
           end
         elsif value.is_a?(Struct) && value.respond_to?(@key)
           value[@key]
@@ -52,10 +52,10 @@ module JMESPath
             value.to_ary[key]
           elsif value.respond_to?(:to_hash)
             value = value.to_hash
-            if !(v = value[key]).nil?
-              v
-            elsif (sym = @key_syms[key]) && !(v = value[sym]).nil?
-              v
+            if value.key?(key)
+              value[key]
+            elsif (sym = @key_syms[key]) && value.key?(sym)
+              value[sym]
             end
           elsif value.is_a?(Struct) && value.respond_to?(key)
             value[key]
