@@ -10,6 +10,7 @@ module JMESPath
   require 'jmespath/nodes'
   require 'jmespath/parser'
   require 'jmespath/runtime'
+  require 'jmespath/caching_runtime'
   require 'jmespath/token'
   require 'jmespath/token_stream'
   require 'jmespath/util'
@@ -28,7 +29,8 @@ module JMESPath
              when IO, StringIO then JSON.parse(data.read)
              else data
         end
-      Runtime.new(runtime_options).search(expression, data)
+      runtime = runtime_options.empty? ? DEFAULT_RUNTIME : Runtime.new(runtime_options)
+      runtime.search(expression, data)
     end
 
     # @api private
@@ -36,4 +38,6 @@ module JMESPath
       JSON.parse(File.open(path, 'r', encoding: 'UTF-8', &:read))
     end
   end
+
+  DEFAULT_RUNTIME = CachingRuntime.new
 end
