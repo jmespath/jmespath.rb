@@ -151,7 +151,11 @@ module JMESPath
           haystack = args[0]
           needle = Util.as_json(args[1])
           if haystack.respond_to?(:to_str)
-            haystack.to_str.include?(needle)
+            if needle.respond_to?(:to_str)
+              haystack.to_str.include?(needle.to_str)
+            else
+              return maybe_raise Errors::InvalidTypeError, 'contains expects a string needle for a string'
+            end
           elsif haystack.respond_to?(:to_ary)
             haystack.to_ary.any? { |e| Util.as_json(e) == needle }
           else
@@ -402,16 +406,19 @@ module JMESPath
       FUNCTIONS['sum'] = self
 
       def call(args)
-        if args.count == 1 && args.first.respond_to?(:to_ary)
-          args.first.to_ary.inject(0) do |sum, n|
-            if Numeric === n
-              sum + n
-            else
-              return maybe_raise Errors::InvalidTypeError, 'function sum() expects values to be numeric'
-            end
-          end
-        else
+        if args.count != 1
           return maybe_raise Errors::InvalidArityError, 'function sum() expects one argument'
+        end
+        unless args.first.respond_to?(:to_ary)
+          return maybe_raise Errors::InvalidTypeError, 'function sum() expects an array'
+        end
+
+        args.first.to_ary.inject(0) do |sum, n|
+          if Numeric === n
+            sum + n
+          else
+            return maybe_raise Errors::InvalidTypeError, 'function sum() expects values to be numeric'
+          end
         end
       end
     end
@@ -616,7 +623,11 @@ module JMESPath
           return maybe_raise Errors::InvalidArityError, msg
         end
         args.inject({}) do |h, v|
-          h.merge(v)
+          if v.respond_to?(:to_hash)
+            h.merge(v.to_hash)
+          else
+            return maybe_raise Errors::InvalidTypeError, 'function merge() expects object arguments'
+          end
         end
       end
     end
@@ -625,8 +636,8 @@ module JMESPath
       FUNCTIONS['reverse'] = self
 
       def call(args)
-        if args.count == 0
-          msg = 'function reverse() expects 1 or more arguments'
+        if args.count != 1
+          msg = 'function reverse() expects one argument'
           return maybe_raise Errors::InvalidArityError, msg
         end
         value = args.first
@@ -645,6 +656,10 @@ module JMESPath
       FUNCTIONS['to_array'] = self
 
       def call(args)
+        if args.count != 1
+          return maybe_raise Errors::InvalidArityError, 'function to_array() expects one argument'
+        end
+
         value = args.first
         value.respond_to?(:to_ary) ? value.to_ary : [value]
       end
