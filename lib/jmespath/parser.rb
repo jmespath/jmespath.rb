@@ -114,7 +114,11 @@ module JMESPath
       pairs = []
       begin
         pairs << parse_key_value_pair(stream)
-        stream.next(match: valid_keys) if stream.token.type == :comma
+        if stream.token.type == :comma
+          stream.next(match: valid_keys)
+        elsif stream.token.type != :rbrace
+          raise Errors::SyntaxError, 'expected a comma or closing rbrace'
+        end
       end while stream.token.type != :rbrace
       stream.next
       Nodes::MultiSelectHash.new(pairs)
@@ -215,7 +219,14 @@ module JMESPath
       stream.next
       while stream.token.type != :rparen
         args << expr(stream, 0)
-        stream.next if stream.token.type == :comma
+        if stream.token.type == :comma
+          stream.next
+          if stream.token.type == :rparen
+            raise Errors::SyntaxError, 'expression expected, found rparen'
+          end
+        elsif stream.token.type != :rparen
+          raise Errors::SyntaxError, 'expected a comma or closing rparen'
+        end
       end
       stream.next
       Nodes::Function.create(name, args, disable_visit_errors: @disable_visit_errors)
@@ -294,8 +305,10 @@ module JMESPath
         if stream.token.type == :comma
           stream.next
           if stream.token.type == :rbracket
-            raise Errors::SyntaxError, 'expression epxected, found rbracket'
+            raise Errors::SyntaxError, 'expression expected, found rbracket'
           end
+        elsif stream.token.type != :rbracket
+          raise Errors::SyntaxError, 'expected a comma or closing rbracket'
         end
       end while stream.token.type != :rbracket
       stream.next
