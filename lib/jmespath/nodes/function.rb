@@ -474,8 +474,10 @@ module JMESPath
           if get_type(args[0]) == ARRAY_TYPE && get_type(args[1]) == EXPRESSION_TYPE
             values = args[0].to_ary
             expression = args[1]
+            return [] if values.empty?
+
             array_type = get_type(expression.eval(values[0]))
-            if array_type == STRING_TYPE || array_type == NUMBER_TYPE || values.empty?
+            if array_type == STRING_TYPE || array_type == NUMBER_TYPE
               # stable sort the list
               n = 0
               values.sort_by do |value|
@@ -509,6 +511,8 @@ module JMESPath
           expression = args[1]
           if get_type(values) == ARRAY_TYPE && get_type(expression) == EXPRESSION_TYPE
             values = values.to_ary
+            return nil if values.empty?
+
             type = get_type(expression.eval(values.first))
             if type != NUMBER_TYPE && type != STRING_TYPE
               msg = "function #{mode}() expects values to be strings or numbers"
